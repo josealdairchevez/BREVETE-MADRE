@@ -1,1 +1,1280 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simulador de Brevete - ¡Tú puedes Mamá!</title>
 
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+  <!-- SweetAlert2 -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <!-- Google Fonts: Quicksand -->
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: 'Quicksand', sans-serif;
+      background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #a18cd1 100%);
+      background-attachment: fixed;
+      min-height: 100vh;
+    }
+
+    .glass-card {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 15px 35px -10px rgba(0, 0, 0, 0.2);
+    }
+
+    .option-btn {
+      transition: all 0.2s ease;
+    }
+
+    .option-btn:active:not(:disabled) {
+      transform: scale(0.98);
+    }
+
+    .signal-box, .icon-3d {
+      filter: drop-shadow(0 12px 16px rgba(15, 23, 42, 0.25));
+    }
+
+    /* Estilo del Diccionario Interactivo (Palabras Celestes) */
+    .termino-tecnico {
+      color: #0284c7;
+      text-decoration: underline;
+      text-decoration-style: dotted;
+      cursor: pointer;
+      font-weight: 800;
+      transition: color 0.2s ease;
+    }
+
+    .termino-tecnico:hover, .termino-tecnico:active {
+      color: #2563eb;
+    }
+
+    /* Estilos del Gráfico Circular */
+    .circular-chart {
+      display: block;
+      margin: 0 auto;
+      max-width: 100%;
+      max-height: 100%;
+    }
+    .circle-bg {
+      fill: none;
+      stroke: #f1f5f9;
+      stroke-width: 3.8;
+    }
+    .circle {
+      fill: none;
+      stroke-width: 3.5;
+      stroke-linecap: round;
+      animation: progress 1.5s ease-out forwards;
+    }
+    @keyframes progress {
+      0% { stroke-dasharray: 0 100; }
+    }
+    .percentage {
+      fill: #334155;
+      font-family: 'Quicksand', sans-serif;
+      font-weight: 800;
+      font-size: 0.6em;
+      text-anchor: middle;
+    }
+  </style>
+</head>
+<body class="flex items-start justify-center p-3 sm:p-6 text-slate-800">
+
+  <!-- DEFS GLOBALES PARA LOS SVG 3D (reutilizados por todos los íconos) -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <defs>
+      <linearGradient id="gradRed3d" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#fca5a5"/>
+        <stop offset="55%" stop-color="#ef4444"/>
+        <stop offset="100%" stop-color="#b91c1c"/>
+      </linearGradient>
+      <radialGradient id="gradWhite3d" cx="35%" cy="25%" r="85%">
+        <stop offset="0%" stop-color="#ffffff"/>
+        <stop offset="100%" stop-color="#dbe3ef"/>
+      </radialGradient>
+      <linearGradient id="gradSteel3d" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stop-color="#64748b"/>
+        <stop offset="100%" stop-color="#1e293b"/>
+      </linearGradient>
+      <linearGradient id="gradAsphalt3d" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stop-color="#475569"/>
+        <stop offset="100%" stop-color="#1e293b"/>
+      </linearGradient>
+      <linearGradient id="gradGreen3d" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#6ee7b7"/>
+        <stop offset="100%" stop-color="#059669"/>
+      </linearGradient>
+      <linearGradient id="gradAmber3d" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#fde68a"/>
+        <stop offset="100%" stop-color="#d97706"/>
+      </linearGradient>
+      <linearGradient id="gradBlue3d" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#93c5fd"/>
+        <stop offset="100%" stop-color="#1d4ed8"/>
+      </linearGradient>
+      <linearGradient id="gradYellowCar3d" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#fde047"/>
+        <stop offset="100%" stop-color="#ca8a04"/>
+      </linearGradient>
+      <linearGradient id="gradPurpleCar3d" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#c4b5fd"/>
+        <stop offset="100%" stop-color="#6d28d9"/>
+      </linearGradient>
+      <linearGradient id="gradCardPink" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#fff1f4"/>
+        <stop offset="100%" stop-color="#f3e8ff"/>
+      </linearGradient>
+      <linearGradient id="gradCardSky" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#f0f9ff"/>
+        <stop offset="100%" stop-color="#e0f2fe"/>
+      </linearGradient>
+    </defs>
+  </svg>
+
+  <main class="w-full max-w-2xl glass-card rounded-3xl p-4 sm:p-7 mt-2 mb-6 relative">
+
+    <!-- ENCABEZADO -->
+    <header id="quiz-header" class="mb-3 relative">
+      <button onclick="activarModoAleatorio()" type="button" aria-label="Mezclar preguntas" class="absolute top-0 right-0 w-11 h-11 sm:w-12 sm:h-12 flex items-center justify-center bg-indigo-500 text-white rounded-full shadow-md active:scale-95 hover:bg-indigo-600 transition-all text-xl z-10">
+        🔀
+      </button>
+      <h1 class="text-lg sm:text-2xl font-extrabold text-rose-500 uppercase text-center sm:text-left tracking-wide pr-12 sm:pr-14 mb-2">
+        🚗 ¡A POR TU BREVETE MAMÁ!
+      </h1>
+
+      <div class="flex text-sm sm:text-base justify-between items-center bg-white/80 px-3 py-1.5 rounded-xl shadow-sm border border-rose-50 mb-2 font-bold">
+        <span class="text-emerald-500">✔ Bien: <span id="correct-count">0</span></span>
+        <span class="text-slate-300">|</span>
+        <span class="text-rose-400">✖ Mal: <span id="incorrect-count">0</span></span>
+        <span class="text-indigo-500 ml-auto" id="question-index-text">1 de 20</span>
+      </div>
+
+      <div class="w-full bg-rose-100 h-2 rounded-full overflow-hidden">
+        <div id="progress-bar" class="h-full bg-gradient-to-r from-rose-400 to-purple-500 rounded-full transition-all duration-500 w-0"></div>
+      </div>
+    </header>
+
+    <!-- ZONA CENTRAL DE PREGUNTAS -->
+    <section id="quiz-container">
+
+      <div id="image-container" class="hidden flex justify-center items-center mb-2 max-h-24 sm:max-h-32 overflow-hidden"></div>
+
+      <h2 id="question-text" class="text-xl sm:text-2xl font-extrabold text-slate-800 leading-snug mb-3 text-center sm:text-left">
+        Cargando pregunta...
+      </h2>
+
+      <div id="options-container" class="space-y-2 mb-3"></div>
+
+      <!-- Feedback -->
+      <div id="feedback-box" class="hidden p-4 sm:p-5 rounded-2xl shadow-md border-2 flex flex-col gap-3 mt-3 transition-all">
+
+        <div>
+          <div class="flex items-center justify-between mb-2">
+             <div class="flex items-center gap-2 font-bold text-lg sm:text-xl" id="feedback-title"></div>
+             <button id="change-explanation-btn" type="button" class="hidden bg-white/50 hover:bg-white text-indigo-700 font-bold py-1.5 px-3 rounded-lg border border-indigo-200 text-xs sm:text-sm shadow-sm transition-colors">
+                Otra forma 🔄
+             </button>
+          </div>
+          <p id="feedback-explanation" class="text-base sm:text-lg leading-relaxed text-slate-700 font-medium"></p>
+          <div id="explanation-counter" class="text-xs text-slate-500 font-bold mt-1 text-right hidden">1 de 3</div>
+        </div>
+
+        <div class="flex flex-col sm:flex-row gap-3 mt-2">
+           <button id="finish-early-btn" type="button" onclick="showResults()" class="py-3 px-4 bg-slate-200 text-slate-700 text-sm font-bold rounded-xl shadow active:scale-95 transition-transform">
+             Finalizar Ahora
+           </button>
+           <button id="next-btn" type="button" class="flex-1 w-full py-3.5 bg-gradient-to-r from-rose-500 to-purple-500 text-white text-base sm:text-lg font-bold rounded-xl shadow-lg active:scale-95 transition-transform">
+             Siguiente Pregunta ➔
+           </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- PANTALLA FINAL (DIAGNÓSTICO) -->
+    <section id="results-container" class="hidden flex-col items-center justify-center text-center py-6">
+      <h2 class="text-3xl font-extrabold text-rose-500 mb-2" id="result-main-title">¡Misión Cumplida, Mamá! 🎉</h2>
+      <p class="text-slate-500 text-sm sm:text-base mb-6 font-bold">Tu diagnóstico de hoy:</p>
+
+      <div class="flex flex-col sm:flex-row w-full items-center justify-center gap-6 mb-6">
+        <div class="relative w-36 h-36 shrink-0">
+          <svg viewBox="0 0 36 36" class="circular-chart">
+            <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+            <path class="circle" id="donut-chart" stroke-dasharray="0, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+            <text x="18" y="20.5" class="percentage" id="donut-percentage">0%</text>
+          </svg>
+        </div>
+        <div class="flex flex-col gap-3 w-full max-w-xs">
+          <div class="bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-3 flex items-center justify-between shadow-sm">
+            <div class="text-emerald-700 text-xs font-bold uppercase">Respuestas Correctas</div>
+            <div class="text-emerald-600 text-2xl font-black" id="final-correct">0</div>
+          </div>
+          <div class="bg-rose-50 border border-rose-200 rounded-xl px-4 py-3 flex items-center justify-between shadow-sm">
+            <div class="text-rose-700 text-xs font-bold uppercase">Preguntas a Repasar</div>
+            <div class="text-rose-600 text-2xl font-black" id="final-incorrect">0</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="w-full bg-white border border-slate-200 rounded-xl p-4 shadow-sm mb-6 text-left" id="diagnostic-box">
+        <div class="flex items-center gap-2 mb-2">
+          <span class="text-2xl" id="diagnostic-icon">💡</span>
+          <h3 class="font-bold text-base text-slate-800" id="diagnostic-title">Mi recomendación:</h3>
+        </div>
+        <p class="text-slate-600 text-sm leading-relaxed" id="diagnostic-text"></p>
+      </div>
+
+      <div class="flex flex-col sm:flex-row gap-3 w-full max-w-md">
+        <button onclick="restartQuiz(false)" type="button" class="flex-1 py-3.5 bg-white border-2 border-emerald-400 text-emerald-500 text-sm font-bold rounded-xl shadow-sm hover:bg-emerald-50 transition-colors">
+          Repetir Orden
+        </button>
+        <button onclick="activarModoAleatorio()" type="button" class="flex-1 py-3.5 bg-gradient-to-r from-indigo-500 to-purple-600 text-white text-sm font-bold rounded-xl shadow-md hover:shadow-lg transition-all">
+          Nuevo Mezclado 🔀
+        </button>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    // =============================================================
+    // FÁBRICA DE ÍCONOS SVG "PREMIUM 3D" (reemplaza los emoticones)
+    // =============================================================
+    function brilloElipse(cx, cy, rx, ry) {
+      return `<ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="#ffffff" opacity="0.35"/>`;
+    }
+    function sombraSuelo(cx, cy, rx, ry) {
+      return `<ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="#0f172a" opacity="0.18"/>`;
+    }
+
+    // --- Íconos interiores (pictogramas negros) para señales circulares ---
+    const iconoFlechaCurvaIzq = `<path d="M 60 68 L 60 40 Q 60 30 50 30 L 30 30 M 40 20 L 30 30 L 40 40" stroke="#1e293b" stroke-width="8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`;
+    const iconoFlechaArriba = `<path d="M 50 75 L 50 27 M 35 42 L 50 27 L 65 42" stroke="#1e293b" stroke-width="10" fill="none" stroke-linejoin="round" stroke-linecap="round"/>`;
+    const iconoMallaCoche = `<path d="M 22 34 L 78 34 M 22 50 L 78 50 M 22 66 L 78 66 M 34 22 L 34 78 M 50 22 L 50 78 M 66 22 L 66 78" stroke="#cbd5e1" stroke-width="2"/><rect x="28" y="40" width="44" height="24" rx="5" fill="#1e293b"/><circle cx="36" cy="64" r="5" fill="#475569"/><circle cx="64" cy="64" r="5" fill="#475569"/>`;
+    const iconoBocina = `<path d="M 60 38 L 76 27 L 76 73 L 60 62 L 33 62 L 33 38 Z" fill="#1e293b"/><path d="M 82 35 Q 90 50 82 65" stroke="#1e293b" stroke-width="5" fill="none" stroke-linecap="round"/>`;
+
+    // Señal circular reglamentaria en 3D (prohibición o mandato), sobre tarjeta con sombra
+    function senalCircular3D(iconoInterior, prohibido) {
+      return `<svg viewBox="0 0 120 120" class="w-20 h-20 sm:w-24 sm:h-24 icon-3d">
+        <rect x="3" y="3" width="114" height="114" rx="24" fill="url(#gradCardPink)"/>
+        ${sombraSuelo(60,104,34,6)}
+        <circle cx="60" cy="60" r="46" fill="url(#gradRed3d)"/>
+        <circle cx="60" cy="60" r="37" fill="url(#gradWhite3d)"/>
+        ${brilloElipse(46,36,20,10)}
+        <g transform="translate(10,10)">${iconoInterior}</g>
+        ${prohibido ? '<line x1="33" y1="31" x2="87" y2="89" stroke="#dc2626" stroke-width="9" stroke-linecap="round"/>' : ''}
+      </svg>`;
+    }
+
+    // Señal "Prohibido estacionar" (disco azul, aro rojo, letra P), sobre tarjeta con sombra
+    function senalNoEstacionar3D() {
+      return `<svg viewBox="0 0 120 120" class="w-20 h-20 sm:w-24 sm:h-24 icon-3d">
+        <rect x="3" y="3" width="114" height="114" rx="24" fill="url(#gradCardPink)"/>
+        ${sombraSuelo(60,104,34,6)}
+        <circle cx="60" cy="60" r="46" fill="url(#gradRed3d)"/>
+        <circle cx="60" cy="60" r="37" fill="url(#gradBlue3d)"/>
+        ${brilloElipse(46,38,20,10)}
+        <text x="60" y="74" font-family="Quicksand" font-weight="800" font-size="42" fill="#fff" text-anchor="middle">P</text>
+        <line x1="33" y1="31" x2="87" y2="89" stroke="#dc2626" stroke-width="9" stroke-linecap="round"/>
+      </svg>`;
+    }
+
+    // Semáforo 3D configurable (color activo, todos encendidos, flecha lateral, parpadeo), sobre tarjeta con sombra
+    function semaforo3D({activo=null, todos=false, flecha=null, parpadea=false} = {}) {
+      const rojoOn = todos || activo === 'rojo';
+      const ambarOn = todos || activo === 'ambar';
+      const verdeOn = todos || activo === 'verde';
+      const op = (on) => on ? 1 : 0.16;
+      const brillo = (on, cy) => on ? brilloElipse(56, cy-6, 8, 4) : '';
+      const gradFlecha = flecha === 'roja' ? 'url(#gradRed3d)' : 'url(#gradGreen3d)';
+      return `<svg viewBox="0 0 140 200" class="w-16 h-28 sm:w-20 sm:h-32 icon-3d">
+        <rect x="3" y="3" width="134" height="194" rx="26" fill="url(#gradCardSky)"/>
+        ${sombraSuelo(65,182,30,6)}
+        <rect x="25" y="15" width="70" height="130" rx="18" fill="url(#gradSteel3d)"/>
+        <rect x="25" y="15" width="70" height="18" rx="18" fill="#fff" opacity="0.12"/>
+        <rect x="31" y="21" width="58" height="118" rx="14" fill="#0f172a"/>
+        <circle cx="60" cy="48" r="19" fill="url(#gradRed3d)" opacity="${op(rojoOn)}"/>
+        ${brillo(rojoOn, 48)}
+        <circle cx="60" cy="80" r="19" fill="url(#gradAmber3d)" opacity="${op(ambarOn)}"/>
+        ${brillo(ambarOn, 80)}
+        <circle cx="60" cy="112" r="19" fill="url(#gradGreen3d)" opacity="${op(verdeOn)}"/>
+        ${brillo(verdeOn, 112)}
+        <rect x="52" y="145" width="16" height="20" fill="url(#gradSteel3d)"/>
+        <rect x="28" y="163" width="64" height="10" rx="4" fill="url(#gradSteel3d)"/>
+        ${flecha ? `<rect x="100" y="68" width="28" height="28" rx="7" fill="url(#gradSteel3d)"/>
+          <circle cx="114" cy="82" r="10" fill="${gradFlecha}"/>
+          <path d="${flecha === 'roja' ? 'M 120 82 L 108 82 M 108 82 L 114 76 M 108 82 L 114 88' : 'M 108 82 L 120 82 M 120 82 L 114 76 M 120 82 L 114 88'}" stroke="#fff" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>` : ''}
+        ${parpadea ? '<circle cx="106" cy="28" r="7" fill="#fde68a"><animate attributeName="opacity" values="1;0.15;1" dur="0.9s" repeatCount="indefinite"/></circle>' : ''}
+      </svg>`;
+    }
+
+    // Escena: paradero autorizado con bus y persona esperando (tarjeta + sombras + brillos)
+    function escenaParadero3D() {
+      return `<svg viewBox="0 0 220 160" class="w-36 sm:w-44 icon-3d">
+        <rect x="3" y="3" width="214" height="154" rx="26" fill="url(#gradCardSky)"/>
+        <rect x="14" y="108" width="192" height="38" rx="10" fill="url(#gradAsphalt3d)"/>
+        <rect x="14" y="108" width="192" height="9" rx="4" fill="#94a3b8" opacity="0.55"/>
+        ${sombraSuelo(150,150,58,7)}
+        ${sombraSuelo(58,150,16,5)}
+        <rect x="34" y="55" width="10" height="60" rx="4" fill="url(#gradSteel3d)"/>
+        <rect x="16" y="34" width="80" height="26" rx="10" fill="url(#gradBlue3d)"/>
+        ${brilloElipse(35,42,18,6)}
+        <text x="56" y="52" font-family="Quicksand" font-weight="800" font-size="12" fill="#fff" text-anchor="middle">PARADERO</text>
+        <rect x="95" y="62" width="118" height="52" rx="18" fill="url(#gradYellowCar3d)"/>
+        <rect x="95" y="62" width="118" height="16" rx="18" fill="#fff" opacity="0.25"/>
+        <rect x="106" y="72" width="26" height="20" rx="6" fill="url(#gradBlue3d)"/>
+        <rect x="138" y="72" width="26" height="20" rx="6" fill="url(#gradBlue3d)"/>
+        <rect x="170" y="72" width="26" height="20" rx="6" fill="url(#gradBlue3d)"/>
+        ${brilloElipse(114,78,9,4)}${brilloElipse(146,78,9,4)}${brilloElipse(178,78,9,4)}
+        <circle cx="120" cy="116" r="12" fill="url(#gradSteel3d)"/>
+        <circle cx="120" cy="116" r="5" fill="#0f172a"/>
+        <circle cx="190" cy="116" r="12" fill="url(#gradSteel3d)"/>
+        <circle cx="190" cy="116" r="5" fill="#0f172a"/>
+        <circle cx="60" cy="88" r="11" fill="#fbbf24"/>
+        ${brilloElipse(57,84,4,3)}
+        <path d="M 48 100 Q 60 92 72 100 L 72 128 Q 60 134 48 128 Z" fill="url(#gradPurpleCar3d)"/>
+      </svg>`;
+    }
+
+    // Escena: dos autos en pista, adelantamiento / cortesía al ser sobrepasada
+    function escenaAdelantamiento3D(cortesia) {
+      const x2 = cortesia ? 150 : 118;
+      const y2 = 96;
+      return `<svg viewBox="0 0 220 150" class="w-36 sm:w-44 icon-3d">
+        <rect x="3" y="3" width="214" height="144" rx="26" fill="url(#gradCardSky)"/>
+        <rect x="14" y="18" width="192" height="114" rx="16" fill="url(#gradAsphalt3d)"/>
+        <line x1="14" y1="75" x2="206" y2="75" stroke="#facc15" stroke-width="5" stroke-dasharray="16 12" stroke-linecap="round"/>
+        <line x1="14" y1="30" x2="206" y2="30" stroke="#f8fafc" stroke-width="3" opacity="0.55"/>
+        <line x1="14" y1="120" x2="206" y2="120" stroke="#f8fafc" stroke-width="3" opacity="0.55"/>
+        ${sombraSuelo(57,72,32,6)}
+        <rect x="28" y="42" width="58" height="30" rx="14" fill="url(#gradPurpleCar3d)"/>
+        <rect x="28" y="42" width="58" height="11" rx="11" fill="#fff" opacity="0.25"/>
+        <rect x="38" y="49" width="18" height="14" rx="4" fill="#e0f2fe" opacity="0.9"/>
+        ${sombraSuelo(x2+29,y2+32,32,6)}
+        <rect x="${x2}" y="${y2}" width="58" height="30" rx="14" fill="url(#gradYellowCar3d)"/>
+        <rect x="${x2}" y="${y2}" width="58" height="11" rx="11" fill="#fff" opacity="0.25"/>
+        <rect x="${x2+10}" y="${y2+7}" width="18" height="14" rx="4" fill="#e0f2fe" opacity="0.9"/>
+      </svg>`;
+    }
+
+    // Escena: avenida girando a la izquierda con direccional parpadeando
+    function escenaGiroIzquierda3D() {
+      return `<svg viewBox="0 0 220 170" class="w-36 sm:w-44 icon-3d">
+        <rect x="3" y="3" width="214" height="164" rx="26" fill="url(#gradCardPink)"/>
+        <rect x="14" y="14" width="192" height="142" rx="18" fill="url(#gradAsphalt3d)"/>
+        <path d="M 195 45 L 95 45 Q 45 45 45 95 L 45 156" stroke="#f8fafc" stroke-width="4" stroke-dasharray="14 10" fill="none" opacity="0.65"/>
+        ${sombraSuelo(150,72,30,6)}
+        <g transform="rotate(-28 150 68)">
+          <rect x="121" y="53" width="58" height="30" rx="14" fill="url(#gradPurpleCar3d)"/>
+          <rect x="121" y="53" width="58" height="11" rx="11" fill="#fff" opacity="0.25"/>
+        </g>
+        <circle cx="185" cy="55" r="7" fill="#fde68a">
+          <animate attributeName="opacity" values="1;0.15;1" dur="0.8s" repeatCount="indefinite"/>
+        </circle>
+      </svg>`;
+    }
+
+    // Escena: pista con varios carriles y auto cambiando de carril con direccional
+    function escenaCarril3D() {
+      return `<svg viewBox="0 0 220 150" class="w-36 sm:w-44 icon-3d">
+        <rect x="3" y="3" width="214" height="144" rx="26" fill="url(#gradCardPink)"/>
+        <rect x="14" y="18" width="192" height="114" rx="16" fill="url(#gradAsphalt3d)"/>
+        <line x1="14" y1="50" x2="206" y2="50" stroke="#f8fafc" stroke-width="3" stroke-dasharray="14 10" opacity="0.65"/>
+        <line x1="14" y1="100" x2="206" y2="100" stroke="#f8fafc" stroke-width="3" stroke-dasharray="14 10" opacity="0.65"/>
+        ${sombraSuelo(121,93,32,6)}
+        <rect x="92" y="60" width="58" height="30" rx="14" fill="url(#gradPurpleCar3d)"/>
+        <rect x="92" y="60" width="58" height="11" rx="11" fill="#fff" opacity="0.25"/>
+        <path d="M 150 68 Q 182 68 182 40" stroke="#fde047" stroke-width="5" fill="none" stroke-linecap="round"/>
+        <path d="M 173 42 L 182 35 L 189 44" stroke="#fde047" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>`;
+    }
+
+    // Escena: cruce ferroviario con tren
+    function escenaTren3D() {
+      return `<svg viewBox="0 0 200 170" class="w-32 sm:w-40 icon-3d">
+        <rect x="3" y="3" width="194" height="164" rx="26" fill="url(#gradCardSky)"/>
+        <rect x="14" y="118" width="172" height="40" rx="12" fill="url(#gradAsphalt3d)"/>
+        <line x1="14" y1="132" x2="186" y2="132" stroke="#cbd5e1" stroke-width="4"/>
+        <line x1="14" y1="146" x2="186" y2="146" stroke="#cbd5e1" stroke-width="4"/>
+        ${Array.from({length:7}).map((_,i)=>`<rect x="${18+i*24}" y="126" width="12" height="26" rx="2" fill="#78350f"/>`).join('')}
+        ${sombraSuelo(151,120,34,6)}
+        <rect x="120" y="58" width="62" height="58" rx="16" fill="url(#gradBlue3d)"/>
+        <rect x="120" y="58" width="62" height="16" rx="16" fill="#fff" opacity="0.2"/>
+        <rect x="130" y="70" width="18" height="16" rx="4" fill="#e0f2fe" opacity="0.9"/>
+        <rect x="154" y="70" width="18" height="16" rx="4" fill="#e0f2fe" opacity="0.9"/>
+        <circle cx="133" cy="112" r="9" fill="url(#gradSteel3d)"/>
+        <circle cx="169" cy="112" r="9" fill="url(#gradSteel3d)"/>
+        <rect x="45" y="22" width="10" height="98" rx="4" fill="url(#gradSteel3d)"/>
+        <circle cx="50" cy="28" r="25" fill="url(#gradWhite3d)"/>
+        ${brilloElipse(42,20,10,5)}
+        <line x1="33" y1="11" x2="67" y2="45" stroke="#dc2626" stroke-width="7" stroke-linecap="round"/>
+        <line x1="67" y1="11" x2="33" y2="45" stroke="#dc2626" stroke-width="7" stroke-linecap="round"/>
+      </svg>`;
+    }
+
+    // Escena: policía de tránsito dirigiendo el tráfico
+    function escenaPolicia3D() {
+      return `<svg viewBox="0 0 160 190" class="w-28 sm:w-36 icon-3d">
+        <rect x="3" y="3" width="154" height="184" rx="26" fill="url(#gradCardPink)"/>
+        ${sombraSuelo(80,172,42,7)}
+        <rect x="52" y="150" width="20" height="35" rx="7" fill="#1e293b"/>
+        <rect x="88" y="150" width="20" height="35" rx="7" fill="#1e293b"/>
+        <rect x="55" y="78" width="50" height="76" rx="16" fill="url(#gradBlue3d)"/>
+        <rect x="55" y="78" width="50" height="14" rx="16" fill="#fff" opacity="0.2"/>
+        <rect x="60" y="78" width="40" height="10" fill="#facc15"/>
+        <g transform="rotate(-32 108 100)">
+          <rect x="100" y="78" width="15" height="46" rx="7" fill="url(#gradWhite3d)"/>
+        </g>
+        <rect x="10" y="90" width="46" height="15" rx="7" fill="url(#gradWhite3d)"/>
+        <circle cx="80" cy="46" r="28" fill="url(#gradWhite3d)"/>
+        ${brilloElipse(70,38,10,5)}
+        <rect x="54" y="36" width="52" height="12" rx="5" fill="#1e293b"/>
+        <circle cx="80" cy="46" r="2.5" fill="#0f172a"/>
+      </svg>`;
+    }
+
+    // Escena: licencia de conducir con símbolo de prohibición
+    function escenaLicencia3D() {
+      return `<svg viewBox="0 0 200 150" class="w-32 sm:w-40 icon-3d">
+        <rect x="3" y="3" width="194" height="144" rx="26" fill="url(#gradCardSky)"/>
+        ${sombraSuelo(100,128,80,7)}
+        <rect x="18" y="24" width="164" height="100" rx="18" fill="url(#gradBlue3d)"/>
+        <rect x="18" y="24" width="164" height="20" rx="18" fill="#fff" opacity="0.2"/>
+        <circle cx="60" cy="80" r="26" fill="url(#gradWhite3d)"/>
+        <circle cx="60" cy="70" r="11" fill="#94a3b8"/>
+        <path d="M 42 93 Q 60 74 78 93" fill="#94a3b8"/>
+        <rect x="100" y="52" width="72" height="9" rx="4" fill="#e0f2fe" opacity="0.9"/>
+        <rect x="100" y="70" width="72" height="7" rx="4" fill="#e0f2fe" opacity="0.6"/>
+        <rect x="100" y="84" width="52" height="7" rx="4" fill="#e0f2fe" opacity="0.6"/>
+        <circle cx="158" cy="112" r="20" fill="url(#gradRed3d)"/>
+        ${brilloElipse(150,104,8,4)}
+        <line x1="148" y1="102" x2="168" y2="122" stroke="#fff" stroke-width="4" stroke-linecap="round"/>
+      </svg>`;
+    }
+
+    // =============================================================
+    // DICCIONARIO INTERACTIVO AMPLIADO (18 términos, explicación
+    // detallada + ejemplo + ícono propio para cada uno)
+    // =============================================================
+    const diccionario = {
+      "vía": {
+        titulo: "La Vía (la calle entera)",
+        definicion: "Mamita, la 'vía' es como llamamos a toda la calle de pared a pared: incluye la pista por donde van los carros Y también la vereda por donde camina la gente. Es la palabra 'paraguas' que junta todo eso.",
+        ejemplo: "Cuando el examen dice 'está permitido en la vía', se refiere a toda la calle en general, no solo a una parte de ella.",
+        icono: `<svg viewBox="0 0 100 70" class="w-24 icon-3d"><rect width="100" height="70" fill="url(#gradAsphalt3d)"/><rect y="0" width="100" height="14" fill="#94a3b8"/><line x1="0" y1="35" x2="100" y2="35" stroke="#fff" stroke-width="3" stroke-dasharray="10 8"/><rect y="56" width="100" height="14" fill="#94a3b8"/></svg>`
+      },
+      "intersección": {
+        titulo: "Intersección (la esquina)",
+        definicion: "Es una palabra elegante para decir 'cruce' o 'esquina'. Es justo ese cuadrado en medio donde dos calles se chocan en forma de cruz o de aspa.",
+        ejemplo: "Si el examen dice 'no te detengas dentro de la intersección', significa que no te quedes parada justo en medio de la esquina.",
+        icono: `<svg viewBox="0 0 100 100" class="w-24 icon-3d"><rect width="100" height="100" fill="url(#gradAsphalt3d)"/><rect x="40" y="0" width="20" height="100" fill="#334155"/><rect x="0" y="40" width="100" height="20" fill="#334155"/><line x1="50" y1="0" x2="50" y2="100" stroke="#fff" stroke-width="2" stroke-dasharray="8 6"/><line x1="0" y1="50" x2="100" y2="50" stroke="#fff" stroke-width="2" stroke-dasharray="8 6"/></svg>`
+      },
+      "calzada": {
+        titulo: "La Calzada (la pista)",
+        definicion: "Es el nombre técnico para la 'pista'. Es únicamente esa franja de asfalto negro por donde ruedan las llantas de tu carro, sin contar la vereda.",
+        ejemplo: "'Reducción de calzada' significa que la pista se hace más angosta más adelante, así que hay que tener cuidado.",
+        icono: `<svg viewBox="0 0 100 60" class="w-24 icon-3d"><rect width="100" height="60" fill="url(#gradAsphalt3d)"/><line x1="0" y1="30" x2="100" y2="30" stroke="#fff" stroke-width="3" stroke-dasharray="10 8"/></svg>`
+      },
+      "carril": {
+        titulo: "El Carril (los pasadizos)",
+        definicion: "Son como 'pasadizos' pintados con rayas blancas dentro de la pista. Sirven para que los carros vayan en filita, uno detrás de otro, sin chocarse de costado.",
+        ejemplo: "Una avenida de 'dos carriles' tiene dos filas de carros yendo en el mismo sentido, una al lado de la otra.",
+        icono: `<svg viewBox="0 0 100 60" class="w-24 icon-3d"><rect width="100" height="60" fill="url(#gradAsphalt3d)"/><line x1="33" y1="0" x2="33" y2="60" stroke="#fff" stroke-width="2" stroke-dasharray="8 6"/><line x1="66" y1="0" x2="66" y2="60" stroke="#fff" stroke-width="2" stroke-dasharray="8 6"/></svg>`
+      },
+      "berma": {
+        titulo: "La Berma (el borde salvavidas)",
+        definicion: "Es esa franja de tierrita o asfalto que sobra a los costados de la carretera. No es para manejar ahí normalmente, es solo un espacio para estacionarte si se te malogra el carro.",
+        ejemplo: "Si tu carro se apaga en la carretera, debes orillarte hacia la berma para no bloquear el tráfico.",
+        icono: `<svg viewBox="0 0 100 60" class="w-24 icon-3d"><rect width="100" height="60" fill="url(#gradAsphalt3d)"/><rect x="0" y="0" width="14" height="60" fill="#a16207"/><rect x="86" y="0" width="14" height="60" fill="#a16207"/></svg>`
+      },
+      "pavimento": {
+        titulo: "El Pavimento",
+        definicion: "Es la superficie dura (de asfalto o concreto) con la que está cubierta la pista. Cuando el examen habla del 'estado del pavimento', se refiere a si la pista está lisa, mojada, rota o resbalosa.",
+        ejemplo: "Con lluvia, el pavimento se pone resbaloso, así que hay que manejar más despacio.",
+        icono: `<svg viewBox="0 0 100 60" class="w-24 icon-3d"><rect width="100" height="60" fill="url(#gradAsphalt3d)"/><circle cx="20" cy="15" r="2" fill="#64748b"/><circle cx="55" cy="35" r="2" fill="#64748b"/><circle cx="80" cy="10" r="2" fill="#64748b"/><circle cx="35" cy="48" r="2" fill="#64748b"/></svg>`
+      },
+      "cruce peatonal": {
+        titulo: "Cruce Peatonal (rayitas blancas)",
+        definicion: "Son esas franjas blancas pintadas en la pista, como una 'cebra', que marcan por dónde deben cruzar las personas caminando. Ahí el peatón tiene preferencia.",
+        ejemplo: "Cuando veas el cruce peatonal con gente esperando para cruzar, debes detener el carro y dejarlos pasar primero.",
+        icono: `<svg viewBox="0 0 100 60" class="w-24 icon-3d"><rect width="100" height="60" fill="url(#gradAsphalt3d)"/><rect x="10" y="0" width="10" height="60" fill="#fff"/><rect x="30" y="0" width="10" height="60" fill="#fff"/><rect x="50" y="0" width="10" height="60" fill="#fff"/><rect x="70" y="0" width="10" height="60" fill="#fff"/><circle cx="85" cy="20" r="6" fill="#f59e0b"/><rect x="80" y="28" width="10" height="18" rx="4" fill="url(#gradPurpleCar3d)"/></svg>`
+      },
+      "circulación rápida": {
+        titulo: "Circulación Rápida",
+        definicion: "Es cuando se permite ir a una velocidad alta porque la vía está despejada, como en una autopista. Es lo contrario de ir con cuidado o prevención.",
+        ejemplo: "En el examen, 'circulación rápida' suele ser una alternativa incorrecta cuando la pregunta habla de luces de precaución, porque la prevención pide ir MÁS despacio, no más rápido.",
+        icono: `<svg viewBox="0 0 100 60" class="w-24 icon-3d"><rect width="100" height="60" fill="url(#gradAsphalt3d)"/><rect x="20" y="24" width="45" height="20" rx="6" fill="url(#gradYellowCar3d)"/><line x1="10" y1="20" x2="18" y2="20" stroke="#fff" stroke-width="3"/><line x1="10" y1="30" x2="16" y2="30" stroke="#fff" stroke-width="3"/><line x1="10" y1="40" x2="18" y2="40" stroke="#fff" stroke-width="3"/></svg>`
+      },
+      "paso con prevención": {
+        titulo: "Paso con Prevención",
+        definicion: "Significa que sí puedes avanzar, pero con mucho cuidado: mirando bien a los costados y lista para frenar si aparece algo inesperado. No es un 'stop' total, pero tampoco es pasar confiada.",
+        ejemplo: "El semáforo ámbar pide 'paso con prevención': si ya estás muy cerca, cruzas despacio y alerta.",
+        icono: `<svg viewBox="0 0 100 60" class="w-24 icon-3d"><rect width="100" height="60" fill="url(#gradAsphalt3d)"/><rect x="30" y="24" width="45" height="20" rx="6" fill="url(#gradPurpleCar3d)"/><path d="M 12 30 L 20 14 L 28 30 Z" fill="url(#gradAmber3d)"/><text x="20" y="28" font-size="10" font-weight="800" fill="#78350f" text-anchor="middle">!</text></svg>`
+      },
+      "carga": {
+        titulo: "Carga (mercadería)",
+        definicion: "Es la palabra que se usa para referirse a los paquetes, mercadería o materiales que transporta un vehículo (por ejemplo, un camión), a diferencia de 'pasajeros' que son personas.",
+        ejemplo: "Un camión que reparte cajas de gaseosa está transportando 'carga', no pasajeros.",
+        icono: `<svg viewBox="0 0 100 70" class="w-24 icon-3d"><rect x="20" y="30" width="26" height="26" rx="3" fill="url(#gradAmber3d)"/><rect x="50" y="20" width="30" height="36" rx="3" fill="url(#gradSteel3d)"/></svg>`
+      },
+      "descarga": {
+        titulo: "Descarga",
+        definicion: "Es la acción de bajar esa mercadería del vehículo. Va de la mano con 'carga': primero se carga (se sube) y luego se descarga (se baja).",
+        ejemplo: "Cuando ves un camión parado bajando cajas frente a una tienda, está haciendo la 'descarga' de su mercadería.",
+        icono: `<svg viewBox="0 0 100 70" class="w-24 icon-3d"><rect x="20" y="34" width="26" height="26" rx="3" fill="url(#gradAmber3d)"/><path d="M 65 15 L 65 40 M 55 30 L 65 40 L 75 30" stroke="#1e293b" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>`
+      },
+      "señal direccional": {
+        titulo: "Señal Direccional",
+        definicion: "Es la luz que prende tu carro (a la izquierda o a la derecha) para avisarle a los demás conductores hacia dónde vas a girar o cambiar de carril. También se le dice 'luz direccional' o 'intermitente'.",
+        ejemplo: "Antes de doblar en la esquina, prendes tu señal direccional para que el carro de atrás sepa que vas a girar.",
+        icono: `<svg viewBox="0 0 100 60" class="w-24 icon-3d"><rect x="15" y="15" width="55" height="30" rx="8" fill="url(#gradPurpleCar3d)"/><circle cx="80" cy="30" r="9" fill="url(#gradAmber3d)"><animate attributeName="opacity" values="1;0.2;1" dur="0.8s" repeatCount="indefinite"/></circle></svg>`
+      },
+      "múltiples carriles": {
+        titulo: "Múltiples Carriles",
+        definicion: "Se refiere a una pista que tiene más de un 'pasadizo' para ir en el mismo sentido, es decir, varias filas de carros lado a lado, no solo una.",
+        ejemplo: "Una avenida grande de 3 carriles te permite elegir en cuál de las 3 filas manejar.",
+        icono: `<svg viewBox="0 0 100 60" class="w-24 icon-3d"><rect width="100" height="60" fill="url(#gradAsphalt3d)"/><line x1="25" y1="0" x2="25" y2="60" stroke="#fff" stroke-width="2" stroke-dasharray="8 6"/><line x1="50" y1="0" x2="50" y2="60" stroke="#fff" stroke-width="2" stroke-dasharray="8 6"/><line x1="75" y1="0" x2="75" y2="60" stroke="#fff" stroke-width="2" stroke-dasharray="8 6"/></svg>`
+      },
+      "luces direccionales": {
+        titulo: "Luces Direccionales",
+        definicion: "Son las lucecitas ámbar (anaranjadas) que parpadean en las esquinas de tu carro para avisar hacia qué lado vas a girar o moverte. Es lo mismo que la 'señal direccional', solo que aquí hablamos de las luces físicas.",
+        ejemplo: "Prender las luces direccionales unos segundos antes de doblar le da tiempo a los demás carros de reaccionar.",
+        icono: `<svg viewBox="0 0 100 60" class="w-24 icon-3d"><rect x="15" y="15" width="55" height="30" rx="8" fill="url(#gradPurpleCar3d)"/><circle cx="80" cy="30" r="9" fill="url(#gradAmber3d)"><animate attributeName="opacity" values="1;0.2;1" dur="0.8s" repeatCount="indefinite"/></circle></svg>`
+      },
+      "recintos militares o policiales": {
+        titulo: "Recintos Militares o Policiales",
+        definicion: "Son los lugares cerrados y vigilados donde funcionan cuarteles del ejército o comisarías de la policía. Suelen tener reglas especiales de tránsito alrededor, como prohibición de tocar el claxon o de estacionarse.",
+        ejemplo: "Cerca a un recinto militar o policial no se debe tocar la bocina, por respeto y por seguridad.",
+        icono: `<svg viewBox="0 0 100 70" class="w-24 icon-3d"><rect x="10" y="30" width="80" height="35" fill="url(#gradSteel3d)"/><rect x="40" y="15" width="20" height="50" fill="#334155"/><circle cx="50" cy="24" r="8" fill="url(#gradWhite3d)"/></svg>`
+      },
+      "soat": {
+        titulo: "El SOAT",
+        definicion: "Son las siglas de 'Seguro Obligatorio de Accidentes de Tránsito'. Es un seguro que todo carro debe tener por ley, y que cubre los gastos médicos si alguien resulta herido en un accidente, sin importar quién tuvo la culpa.",
+        ejemplo: "Manejar sin SOAT es una infracción grave, porque significa que nadie estaría cubierto si ocurre un accidente.",
+        icono: `<svg viewBox="0 0 100 100" class="w-24 icon-3d"><path d="M 50 8 L 85 22 L 85 55 Q 85 82 50 95 Q 15 82 15 55 L 15 22 Z" fill="url(#gradBlue3d)"/><path d="M 35 50 L 45 62 L 68 35" stroke="#fff" stroke-width="7" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>`
+      },
+      "vehículo automotor": {
+        titulo: "Vehículo Automotor",
+        definicion: "Es el nombre técnico para cualquier vehículo que se mueve solo, con su propio motor (a diferencia de una bicicleta o una carreta). Autos, camionetas, camiones y motos son vehículos automotores.",
+        ejemplo: "Cuando el examen dice 'todo vehículo automotor debe...', se refiere a cualquier carro, camión o moto con motor propio.",
+        icono: `<svg viewBox="0 0 100 60" class="w-24 icon-3d"><rect x="15" y="20" width="70" height="24" rx="8" fill="url(#gradPurpleCar3d)"/><path d="M 28 20 L 36 6 L 64 6 L 72 20 Z" fill="url(#gradPurpleCar3d)"/><circle cx="30" cy="46" r="8" fill="url(#gradSteel3d)"/><circle cx="70" cy="46" r="8" fill="url(#gradSteel3d)"/></svg>`
+      },
+      "papeleta": {
+        titulo: "La Papeleta (multa)",
+        definicion: "Es el documento que te entrega un policía cuando cometes una infracción de tránsito. Es lo mismo que decir 'multa': implica pagar una cantidad de dinero como sanción.",
+        ejemplo: "Si te estacionas donde no debes, te pueden poner una papeleta.",
+        icono: `<svg viewBox="0 0 100 100" class="w-24 icon-3d"><rect x="15" y="10" width="70" height="80" rx="6" fill="url(#gradWhite3d)"/><rect x="25" y="24" width="50" height="8" rx="3" fill="#dc2626"/><rect x="25" y="40" width="50" height="6" rx="3" fill="#cbd5e1"/><rect x="25" y="52" width="50" height="6" rx="3" fill="#cbd5e1"/><rect x="25" y="64" width="30" height="6" rx="3" fill="#cbd5e1"/></svg>`
+      }
+    };
+
+    window.mostrarDiccionario = function(palabra) {
+      const palabraMinuscula = palabra.toLowerCase().trim();
+      const data = diccionario[palabraMinuscula];
+      if(!data) return;
+
+      Swal.fire({
+        title: data.titulo,
+        html: `
+          <div class="flex justify-center mb-3">${data.icono}</div>
+          <p class="text-left text-slate-700 text-base leading-relaxed mb-3">${data.definicion}</p>
+          <div class="bg-sky-100 border-l-4 border-sky-400 rounded-lg p-3 text-left">
+            <p class="text-sky-800 text-sm font-bold mb-1">💬 Por ejemplo:</p>
+            <p class="text-slate-700 text-sm leading-relaxed">${data.ejemplo}</p>
+          </div>
+        `,
+        confirmButtonText: '¡Entendido! 👍',
+        customClass: {
+          popup: 'rounded-3xl p-6 shadow-xl border-2 border-sky-200 bg-sky-50',
+          title: 'text-sky-600 font-bold text-2xl font-quicksand mb-2',
+          htmlContainer: 'font-quicksand mt-2',
+          confirmButton: 'bg-sky-500 text-white rounded-xl px-8 py-3 font-bold text-lg hover:scale-105 transition-transform mt-4'
+        }
+      });
+    };
+
+    // Resalta en una sola pasada todos los términos del diccionario
+    // (incluye frases de varias palabras: "cruce peatonal", "múltiples carriles", etc.)
+    function resaltarTexto(texto) {
+      if (!texto) return "";
+      const terminos = Object.keys(diccionario).sort((a, b) => b.length - a.length);
+      const escapados = terminos.map(t => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+      const regex = new RegExp(`\\b(${escapados.join('|')})\\b`, 'gi');
+      return texto.replace(regex, (match) => `<span class="termino-tecnico" onclick="window.mostrarDiccionario(this.innerText)">${match}</span>`);
+    }
+
+    // Frases de aliento que se muestran (al azar) cuando la respuesta es incorrecta
+    const frasesAliento = [
+      "¡No te preocupes, mamá! Tú puedes 💪 Fíjate en esto:",
+      "¡Así se aprende, mamita! Vamos con calma 🌸 Fíjate en esto:",
+      "¡Un pasito más cerca del brevete! Mira esto con cariño ❤️:",
+      "¡Tranquila, mamá! Cada error te hace más fuerte. Fíjate en esto:",
+      "¡Eso no te detiene, mamá! Sigamos juntas, tú puedes 🚗✨:"
+    ];
+
+    // BANCO DE DATOS FASE 1: (3 EXPLICACIONES DINÁMICAS POR PREGUNTA)
+    const baseQuestions = [
+      {
+        id: 1, category: "Reglas de Convivencia",
+        question: "1. Está permitido en la vía:",
+        imageHtml: escenaParadero3D(),
+        options: [
+          "a) Recoger o dejar pasajeros o carga en cualquier lugar.",
+          "b) Dejar animales sueltos.",
+          "c) Recoger o dejar pasajeros en lugares autorizados.",
+          "d) Ejercer comercio ambulatorio."
+        ],
+        correct: 2,
+        explanations: [
+          "Imagina que frenas tu carro en el medio de la pista para que baje tu amiga; el carro que viene atrás rápido podría chocarla por sorpresa. Por eso, SIEMPRE debemos estacionar a un ladito, solo en los paraderos autorizados. ¡La seguridad de las personas es primero!",
+          "Piénsalo así: Si todos pararan donde quisieran para comprar pan o bajar gente, la calle sería un caos total de bocinas y choques. Los paraderos existen para mantener el orden de todos.",
+          "Regla súper fácil: Tu carro solo debe detenerse para recoger gente donde veas el letrerito azul de 'Paradero' o donde haya un espacio pintado para estacionarse. ¡En medio de la calle, nunca!"
+        ]
+      },
+      {
+        id: 2, category: "Autoridad",
+        question: "2. Respecto de los dispositivos de regulación del tránsito (Semáforos y letreros):",
+        imageHtml: escenaPolicia3D(),
+        options: [
+          "a) Solo peatones los obedecen.",
+          "b) Todos los obedecen, salvo instrucción de la Policía.",
+          "c) Solo conductores los obedecen.",
+          "d) Nadie los obedece."
+        ],
+        correct: 1,
+        explanations: [
+          "Piénsalo como en la casa: las reglas de la casa ya están puestas (que sería el semáforo), pero si tú, como mamá (que serías el Policía), das una orden urgente porque pasó algo... ¡lo que tú dices es lo que vale! El Policía siempre manda sobre cualquier semáforo.",
+          "Si el semáforo está en ROJO brillante, pero el policía que está paradito ahí te hace señas con su mano y te dice con el pito '¡Avanza, avanza!', tú le haces caso al policía sin dudar y avanzas.",
+          "Las máquinas (semáforos) son tontas y no ven emergencias. Los humanos (policías) sí pueden ver si hay un choque o algo grave. Por eso, la orden de un policía de tránsito anula todo lo demás."
+        ]
+      },
+      {
+        id: 3, category: "Señales",
+        question: "3. La señal R-6 'prohibido voltear a la izquierda', significa:",
+        imageHtml: senalCircular3D(iconoFlechaCurvaIzq, true),
+        options: [
+          "a) Prohibido voltear a la izquierda y prohibido el giro en U.",
+          "b) Permitido el giro en U.",
+          "c) Solo de frente.",
+          "d) Ninguna."
+        ],
+        correct: 0,
+        explanations: [
+          "Es pura lógica, mamita. Si te dicen que no puedes girar tu timón ni un poquito hacia la izquierda para entrar a una callecita, ¡mucho menos te van a dejar girar el timón al máximo para darte una vuelta entera en 'U' hacia ese mismo lado!",
+          "Para dar una vuelta en 'U' necesitas forzosamente tirar el timón a la izquierda. Si la señal de la esquina te prohíbe ir a la izquierda, indirectamente te está gritando: ¡No hagas la U tampoco!",
+          "Imagina que intentas dar vuelta en U donde está prohibido ir a la izquierda; quedarías atravesada como un gusano en medio de la pista y provocarías un gran choque. ¡Prohibido ambas cosas!"
+        ]
+      },
+      {
+        id: 4, category: "Señales",
+        question: "4. La señal R-3 (flecha negra hacia arriba) significa que:",
+        imageHtml: senalCircular3D(iconoFlechaArriba, false),
+        options: [
+          "a) Zona restringida.",
+          "b) Permitido adelantar.",
+          "c) El único sentido es continuar de frente.",
+          "d) Ninguna."
+        ],
+        correct: 2,
+        explanations: [
+          "Esa flecha grandota apuntando hacia adelante es como un dedo gigante que te dice: '¡Sigue nomás, todo de frente!'. Es una calle de un solo sentido y tu única opción es ir recto.",
+          "No te compliques: flecha recta = camino recto. No puedes doblar a la derecha, ni a la izquierda, ni regresar por esa calle.",
+          "Generalmente encuentras estas señales en callejones estrechos o calles donde si doblas a otro lado entrarías contra el tráfico y te chocarías de frente con todos."
+        ]
+      },
+      {
+        id: 5, category: "Marcas en el piso",
+        question: "5. En las vías, la pintura central discontinua (punteada - - -) de color amarillo significa:",
+        imageHtml: escenaAdelantamiento3D(false),
+        options: [
+          "a) Está permitido cruzar al otro carril para adelantar a otro vehículo, si es seguro.",
+          "b) Prohibido cruzar al otro carril.",
+          "c) Reducción de calzada.",
+          "d) Cruce peatonal."
+        ],
+        correct: 0,
+        explanations: [
+          "Las rayitas cortadas (punteadas) significan libertad. Es como una puerta entreabierta: si ves que el carro de adelante va muy lento como tortuga, y te aseguras de que no viene nadie de frente, SÍ puedes pasarte al otro carril para adelantarlo.",
+          "Color amarillo = la calle es de doble sentido. Rayas punteadas = permiso para adelantar. Así de simple.",
+          "Imagina que vas detrás de un camión viejito echando humo oscuro. La línea punteada en el piso te da permiso para asomarte, mirar bien que no venga nadie, pisar el acelerador, pasarlo por la izquierda y volver a meterte a tu sitio."
+        ]
+      },
+      {
+        id: 6, category: "Semáforos",
+        question: "6. El color ámbar (amarillo) del semáforo significa que:",
+        imageHtml: semaforo3D({activo: 'ambar'}),
+        options: [
+          "a) Avanzar.",
+          "b) Detenerse obligatoriamente.",
+          "c) Acelerar.",
+          "d) Detenerse antes del cruce, si la velocidad lo permite."
+        ],
+        correct: 3,
+        explanations: [
+          "El ámbar es como un aviso de la vida real que dice '¡Cuidado, ya viene el rojo!'. Si estás lejos de la esquina, frenas con mucha calma. Pero OJO, nunca cometas el error de muchos locos de acelerar a fondo para ganarle a la luz, ¡ahí ocurren los peores choques!",
+          "Piensa en el color amarillo como una 'Luz Roja suave'. Su intención real es que vayas pisando el freno suavemente, NO que metas el pie al acelerador.",
+          "Solo cruzas en amarillo si estás tan, pero tan cerquita de la esquina que si pisas el freno de golpe provocarías que el carro que viene atrás te choque la maletera."
+        ]
+      },
+      {
+        id: 7, category: "Semáforos",
+        question: "7. Los colores del semáforo (Rojo - Ámbar - Verde) tienen el siguiente significado en orden:",
+        imageHtml: semaforo3D({todos: true}),
+        options: [
+          "a) Detención - Prevención - Paso libre.",
+          "b) Detención - Paso con prevención - Circulación rápida.",
+          "c) Disminución - Prevención - Paso rápido.",
+          "d) Ninguna."
+        ],
+        correct: 0,
+        explanations: [
+          "Esta te la sabes de memoria desde niña, mamita: El Rojo te dice 'Detente ahí mismo', el Amarillo (Ámbar) te dice 'Prevención, prepárate para frenar', y el Verde te dice 'Tienes el paso libre, avanza'.",
+          "Rojo = Freno total. Amarillo = Prevención (cuidado). Verde = Acelerador suave. ¡Es un código que funciona en todo el mundo!",
+          "No hay mucha ciencia ni palabras raras: Parar (Rojo), Tener cuidado (Ámbar) y Avanzar (Verde)."
+        ]
+      },
+      {
+        id: 8, category: "Semáforos",
+        question: "8. ¿Qué indica una flecha verde brillando en un semáforo vehicular?",
+        imageHtml: semaforo3D({flecha: 'verde'}),
+        options: [
+          "a) Se puede continuar, pero ÚNICAMENTE hacia la dirección de la flecha, desde el carril correcto.",
+          "b) Prohibida la circulación.",
+          "c) Respetar luz circular verde.",
+          "d) Ninguna."
+        ],
+        correct: 0,
+        explanations: [
+          "A veces el semáforo principal está rojo para ir de frente, pero al costado se prende una flechita verde. Eso significa que te están dando un 'permiso especial' para doblar a ese lado (pero tienes que estar acomodada en el carril correcto para hacerlo).",
+          "La flecha verde es como un 'Pase VIP' solo para los que quieren doblar en esa esquina. Si tú quieres ir recto, te toca seguir esperando que prenda tu luz verde redonda.",
+          "¡Asegúrate de estar en el carril correcto! No puedes usar el permiso de doblar con la flecha verde si estás metida en el carril del centro de la pista."
+        ]
+      },
+      {
+        id: 9, category: "Señales",
+        question: "9. La señal R-53 (Un auto encima de una malla cruzada tachada), prohíbe:",
+        imageHtml: senalCircular3D(iconoMallaCoche, true),
+        options: [
+          "a) Estacionar el carro.",
+          "b) Detener el vehículo dentro de la intersección.",
+          "c) Cargar camiones.",
+          "d) Prohíbe la circulación de todo carro."
+        ],
+        correct: 1,
+        explanations: [
+          "Esa 'malla' dibujada es el cruce de las dos calles (la esquina). Si hay un súper tráfico adelante tuyo, ¡NO AVANCES! Quédate esperando antes de la esquina, porque si avanzas, te vas a quedar cruzada en el medio tapando el paso a los otros carros que vienen por el otro lado.",
+          "¿Alguna vez viste a un carro atravesado en el semáforo estorbando a todo el mundo porque no pudo avanzar por el tráfico? Eso es exactamente lo que esta señal quiere evitar que hagas.",
+          "La regla de oro del tráfico: No entres a una esquina si ves que no vas a tener espacio para salir de ella por culpa de la congestión."
+        ]
+      },
+      {
+        id: 10, category: "Semáforos",
+        question: "10. Llegas a una esquina y el semáforo tiene DOS luces al mismo tiempo: Un círculo VERDE normal, y una flecha ROJA a la izquierda. ¿Qué haces?",
+        imageHtml: semaforo3D({activo: 'verde', flecha: 'roja'}),
+        options: [
+          "a) Avanzo por donde sea.",
+          "b) Avanzo de frente, pero hacia la izquierda no doblo por la flecha roja.",
+          "c) Doblo a la izquierda rápido.",
+          "d) Me quedo quieta totalmente."
+        ],
+        correct: 1,
+        explanations: [
+          "¡Súper simple! El foco verde gordito te dice 'si vas de frente, pasa nomás, tienes permiso'. Pero la flechita roja te está gritando '¡Eh, pero a la izquierda ni se te ocurra doblar todavía!'.",
+          "La flecha roja anula tu permiso de doblar. Tienes que esperar que esa flechita chiquita cambie a verde para poder girar tu timón a la izquierda.",
+          "Las luces específicas (como las flechas) siempre le ganan o limitan a la luz general (el círculo redondo) cuando se trata de hacer giros."
+        ]
+      },
+      {
+        id: 11, category: "Semáforos",
+        question: "11. Cuando pasas de madrugada por una esquina y el semáforo está parpadeando (Luz intermitente), es correcto que:",
+        imageHtml: semaforo3D({activo: 'ambar', parpadea: true}),
+        options: [
+          "a) Si la luz amarilla (ámbar) parpadea rápido, debo bajar mi velocidad y cruzar con cautela.",
+          "b) Si es amarilla, freno de golpe como un Pare.",
+          "c) Si es verde parpadeante, es un Pare.",
+          "d) Ninguna es correcta."
+        ],
+        correct: 0,
+        explanations: [
+          "Un semáforo amarillo (ámbar) que prende y apaga solito en la madrugada significa: 'Puedes pasar, es tu turno, pero ve suaaave y abre bien los ojos por si sale otro carro de la nada'.",
+          "El amarillo parpadeante es el equivalente a un letrero de 'Pasa despacito mirando a los dos lados'.",
+          "Se usa mucho de madrugada porque como casi no hay carros, sería aburrido y peligroso esperar 2 minutos parado en luz roja cuando la calle está totalmente vacía."
+        ]
+      },
+      {
+        id: 12, category: "Semáforos",
+        question: "12. Y si de noche ves que la luz que parpadea es ROJA, ¿se comporta igual que un letrero metálico de PARE?",
+        imageHtml: semaforo3D({activo: 'rojo', parpadea: true}),
+        options: [
+          "a) ¡Es totalmente VERDAD!",
+          "b) Verdad, pero solo si hay un policía.",
+          "c) Falso.",
+          "d) Ninguna."
+        ],
+        correct: 0,
+        explanations: [
+          "¡Acertaste! Un foco rojo que parpadea es lo mismito que un letrero rojo gigante de PARE. Tienes que pisar el freno hasta que las llantas dejen de rodar por completo, miras bien, y si no viene nadie, recién metes acelerador.",
+          "Rojo intermitente = Freno total obligatorio. Si la calle está vacía de noche, no importa, igual tienes que detener el carro a CERO de velocidad y luego volver a arrancar.",
+          "Si te pasas de frente un rojo intermitente sin frenar por completo (así sea de madrugada), ¡es una multa recontra segura, mamita!"
+        ]
+      },
+      {
+        id: 13, category: "Reglas de Conducción",
+        question: "13. Para dar una vuelta hacia la izquierda en una avenida grande, la acción correcta es:",
+        imageHtml: escenaGiroIzquierda3D(),
+        options: [
+          "a) Doblar el timón desde cualquier lado.",
+          "b) Ponerme a la derecha y cruzar todo.",
+          "c) Ponerme en el lado más vacío.",
+          "d) Prender luces direccionales desde mucho antes, ponerme en el carril izquierdo y girar."
+        ],
+        correct: 3,
+        explanations: [
+          "El secreto de manejar bien es avisar tus movimientos a tiempo. Si vas a doblar a la izquierda, desde una cuadra antes prendes tu luz, te pasas poco a poco al carril pegado a la vereda izquierda y volteas como toda una dama.",
+          "Nunca dobles cruzando todos los carriles en el último segundo a lo loco. El orden es clave: primero ubícate en el lado correcto con mucho tiempo de anticipación.",
+          "La regla dice que debes poner tu luz intermitente de giro unos 20 o 30 metros antes de llegar a la esquina para que los carros de atrás estén preparados."
+        ]
+      },
+      {
+        id: 14, category: "Reglas de Conducción",
+        question: "14. Para cambiarte de carril en una pista con muchos carros:",
+        imageHtml: escenaCarril3D(),
+        options: [
+          "a) Primero PRENDO mi direccional para avisar, BUSCO un espacio vacío y ME MUEVO con suavidad.",
+          "b) Busco un espacio y me meto rápido.",
+          "c) Toco el claxon como loca.",
+          "d) Prohibido."
+        ],
+        correct: 0,
+        explanations: [
+          "Son 3 pasos de oro, mamita: 1. AVISA a los demás (prendiendo tu luz). 2. MIRA tu espejo lateral (busca un huequito seguro). 3. MUEVE tu timón con suavidad hacia el otro carril.",
+          "La luz direccional es la voz de tu carro. Si te metes a otro carril sin prender tus 'intermitentes', el conductor de atrás se va a asustar y te puede chocar.",
+          "Manejar a la defensiva es hacer movimientos predecibles para todos. Primero avisas, luego actúas. ¡Nada de meterse a la fuerza!"
+        ]
+      },
+      {
+        id: 15, category: "Preferencia de Paso",
+        question: "15. Cuando una calle se cruza con las rieles del TREN:",
+        imageHtml: escenaTren3D(),
+        options: [
+          "a) El Tren SIEMPRE tiene la preferencia absoluta para pasar.",
+          "b) El carro más rápido tiene la preferencia.",
+          "c) El que llegue primerito pasa.",
+          "d) El que viene por la derecha pasa."
+        ],
+        correct: 0,
+        explanations: [
+          "¡Con el tren no se juega a ganarle! Por su peso gigante de puro fierro, un tren necesita casi 1 kilómetro entero para poder frenar por completo. Siempre, siempre el tren tendrá la preferencia y tú tienes que detenerte.",
+          "Tú con tu auto puedes frenar en 2 segunditos; el tren no. Por las leyes de la física, el tren siempre será el rey del cruce.",
+          "Si ves una cruz de madera con una 'X' y una 'R', estás muy cerca a las rieles. Abre bien los ojos, apaga la radio y escucha."
+        ]
+      },
+      {
+        id: 16, category: "Autoridad",
+        question: "16. Llegas a una esquina y el semáforo está ROJO. Pero el Policía de Tránsito toca el pito y te dice que ¡AVANCES! ¿Qué corresponde hacer?",
+        imageHtml: escenaPolicia3D(),
+        options: [
+          "a) Detenerse por la luz roja.",
+          "b) Continuar la marcha (Avanzar).",
+          "c) Estar prevenido.",
+          "d) Ninguna."
+        ],
+        correct: 1,
+        explanations: [
+          "Nunca lo olvides: Un humano manda más que una máquina. Las órdenes manuales del Policía de Tránsito anulan automáticamente cualquier luz del semáforo o letrero que haya en la calle.",
+          "Si el policía dice 'avance' en pleno semáforo rojo, es porque seguramente él ya detuvo el tráfico de la otra calle y es seguro pasar. Confía en la autoridad humana.",
+          "Ignorar a un policía de tránsito por hacerle caso a un semáforo rojo te puede costar una papeleta. ¡Hazle caso a sus brazos!"
+        ]
+      },
+      {
+        id: 17, category: "Estacionamiento",
+        question: "17. Está terminantemente prohibido estacionar tu carro en:",
+        imageHtml: senalNoEstacionar3D(),
+        options: [
+          "a) En las curvas.",
+          "b) Dentro de una intersección (esquina).",
+          "c) Frente a la entrada de garajes.",
+          "d) Todas las alternativas son correctas."
+        ],
+        correct: 3,
+        explanations: [
+          "Estacionar en esos lugares no solo es de mala educación (como tapar el garaje de alguien), sino que es mortal. Si te estacionas en una curva ciega, el que viene manejando rápido te va a chocar porque no te ve a tiempo.",
+          "La esquina (intersección) necesita estar libre para que los carros grandes puedan dar la vuelta y todos puedan ver a los peatones.",
+          "En general, por sentido común, no puedes estacionar en ningún lugar que bloquee la visión o el libre paso de otras personas y carros."
+        ]
+      },
+      {
+        id: 18, category: "Señales",
+        question: "18. La señal R-29 (bocina negra tachada con línea roja), significa:",
+        imageHtml: senalCircular3D(iconoBocina, true),
+        options: [
+          "a) Prohíbe llevar músicos en el carro.",
+          "b) Obliga a tocar claxon en carretera.",
+          "c) Prohíbe hacer uso de la bocina (claxon) en esa zona.",
+          "d) Indica venta de instrumentos musicales."
+        ],
+        correct: 2,
+        explanations: [
+          "Ese dibujo es súper claro: Te dice '¡Shhh! Prohibido tocar el claxon acá'. Casi siempre ponen este cartelito en las puertas de las clínicas, hospitales, colegios o recintos militares o policiales, por respeto.",
+          "El sonido agudo del claxon puede alterar a un paciente enfermo o desconcentrar a los niños en clases. Al ver esa señal, evita tocar la bocina por completo.",
+          "Usar la bocina donde está clavado este letrero es una falta contra la tranquilidad pública y te pueden poner una papeleta."
+        ]
+      },
+      {
+        id: 19, category: "Sanciones",
+        question: "19. ¿A qué persona le cae una multa y no podrá obtener licencia de conducir por 3 LARGOS AÑOS?",
+        imageHtml: escenaLicencia3D(),
+        options: [
+          "a) Al que conduzca un vehículo sin haber sacado nunca su licencia.",
+          "b) Al que conduzca un auto sin comodidad.",
+          "c) Al que conduzca un auto sin SOAT.",
+          "d) a y c son correctas."
+        ],
+        correct: 0,
+        explanations: [
+          "El Estado es súper duro con esto. Si un chofer se cree 'vivo' y sale a manejar por la calle sin haber ido nunca a estudiar ni a sacar su brevete oficial, el castigo es bloquearlo para que no pueda sacar brevete por 3 años completos.",
+          "Manejar sin licencia demuestra que no conoces las reglas, poniendo en riesgo de atropello a todos. Por eso el castigo es tan severo.",
+          "Tu brevete es el único papel que demuestra legalmente que estás apta para manejar un vehículo automotor de más de 1000 kilos en las calles."
+        ]
+      },
+      {
+        id: 20, category: "Reglas de Convivencia",
+        question: "20. Si vas manejando y un carro te alcanza para sobrepasarte (adelantarte), ¿qué deberías hacer?",
+        imageHtml: escenaAdelantamiento3D(true),
+        options: [
+          "a) Aumentar la velocidad para no dejarme ganar.",
+          "b) Mantener mi misma velocidad tranquilamente y dejar que me pase sin problemas.",
+          "c) Frenar con todo de golpe.",
+          "d) Sacar la mano por la ventana."
+        ],
+        correct: 1,
+        explanations: [
+          "Las calles no son pistas de carreras, mamita. Si alguien está apurado y quiere pasarte, tú relájate, mantén tu pie quieto en el acelerador y déjalo que se vaya. Competir es causa de accidentes graves.",
+          "Incluso, si ves que al otro carro le está costando trabajo pasarte, puedes soltar un poquitito el acelerador para ayudarle a terminar su maniobra rápido y seguro.",
+          "Ser un conductor a la defensiva significa evitar los problemas y 'locuras' de los demás. Déjalo que se adelante y tú sigue tu camino en paz escuchando tu musiquita."
+        ]
+      }
+    ];
+
+    let currentQuestions = [...baseQuestions];
+    let currentIndex = 0;
+    let correctCount = 0;
+    let incorrectCount = 0;
+    let hasAnswered = false;
+    let modoAleatorio = false;
+    let currentExplanationIndex = 0;
+
+    let erroresPorCategoria = {
+        "Señales": 0,
+        "Reglas de Conducción": 0,
+        "Reglas de Convivencia": 0,
+        "Autoridad": 0,
+        "Marcas en el piso": 0,
+        "Semáforos": 0,
+        "Preferencia de Paso": 0,
+        "Estacionamiento": 0,
+        "Sanciones": 0
+    };
+
+    // Referencias DOM
+    const header = document.getElementById("quiz-header");
+    const quizContainer = document.getElementById("quiz-container");
+    const resultsContainer = document.getElementById("results-container");
+
+    const questionText = document.getElementById("question-text");
+    const imageContainer = document.getElementById("image-container");
+    const optionsContainer = document.getElementById("options-container");
+    const feedbackBox = document.getElementById("feedback-box");
+    const feedbackTitle = document.getElementById("feedback-title");
+    const feedbackExplanation = document.getElementById("feedback-explanation");
+    const nextBtn = document.getElementById("next-btn");
+    const changeExplanationBtn = document.getElementById("change-explanation-btn");
+    const explanationCounter = document.getElementById("explanation-counter");
+    const finishEarlyBtn = document.getElementById("finish-early-btn");
+
+    const progressBar = document.getElementById("progress-bar");
+    const questionIndexText = document.getElementById("question-index-text");
+    const correctCountElem = document.getElementById("correct-count");
+    const incorrectCountElem = document.getElementById("incorrect-count");
+
+    function shuffleArray(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+    }
+
+    function activarModoAleatorio() {
+      Swal.fire({
+        title: '¡Modo Simulacro! 🔀',
+        text: 'Las preguntas aparecerán desordenadas. ¡Concéntrate, tú puedes mamita!',
+        icon: 'success',
+        confirmButtonColor: '#8b5cf6'
+      }).then(() => {
+        restartQuiz(true);
+      });
+    }
+
+    function loadQuestion() {
+      hasAnswered = false;
+      feedbackBox.classList.add("hidden");
+      currentExplanationIndex = 0;
+
+      const currentQ = currentQuestions[currentIndex];
+      const prefijo = modoAleatorio ? `(${currentQ.id}) ` : "";
+
+      let textoPreguntaTratado = currentQ.question.replace(/^\d+\.\s*/, '');
+      textoPreguntaTratado = resaltarTexto(textoPreguntaTratado);
+      questionText.innerHTML = prefijo + textoPreguntaTratado;
+
+      if (currentQ.imageHtml) {
+        imageContainer.innerHTML = currentQ.imageHtml;
+        imageContainer.classList.remove("hidden");
+      } else {
+        imageContainer.innerHTML = "";
+        imageContainer.classList.add("hidden");
+      }
+
+      questionIndexText.textContent = `${currentIndex + 1} de ${currentQuestions.length}`;
+      progressBar.style.width = `${(currentIndex / currentQuestions.length) * 100}%`;
+
+      optionsContainer.innerHTML = "";
+      currentQ.options.forEach((option, idx) => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "option-btn w-full p-3 sm:p-4 text-left font-bold text-slate-700 bg-white border-2 border-transparent hover:border-rose-300 rounded-2xl flex items-start gap-3 text-lg sm:text-xl shadow-sm";
+        btn.innerHTML = `<span class="flex-1 leading-snug">${resaltarTexto(option)}</span>`;
+
+        btn.addEventListener('click', function(e) {
+           e.preventDefault();
+           selectOption(idx);
+        });
+
+        optionsContainer.appendChild(btn);
+      });
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function renderExplanation() {
+      const currentQ = currentQuestions[currentIndex];
+      feedbackExplanation.innerHTML = resaltarTexto(currentQ.explanations[currentExplanationIndex]);
+
+      if (currentQ.explanations.length > 1) {
+          changeExplanationBtn.classList.remove("hidden");
+          explanationCounter.classList.remove("hidden");
+          explanationCounter.textContent = `Explicación ${currentExplanationIndex + 1} de ${currentQ.explanations.length}`;
+      } else {
+          changeExplanationBtn.classList.add("hidden");
+          explanationCounter.classList.add("hidden");
+      }
+    }
+
+    changeExplanationBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      const currentQ = currentQuestions[currentIndex];
+      currentExplanationIndex++;
+      if (currentExplanationIndex >= currentQ.explanations.length) {
+          currentExplanationIndex = 0;
+      }
+      renderExplanation();
+    });
+
+    function selectOption(selectedIdx) {
+      if (hasAnswered) return;
+      hasAnswered = true;
+
+      const currentQ = currentQuestions[currentIndex];
+      const buttons = optionsContainer.querySelectorAll("button");
+      const isCorrect = selectedIdx === currentQ.correct;
+
+      buttons.forEach((btn, idx) => {
+        btn.disabled = true;
+        btn.classList.remove("bg-white", "hover:border-rose-300");
+
+        if (idx === currentQ.correct) {
+          btn.classList.add("bg-emerald-100", "border-emerald-500", "text-emerald-950", "shadow-md");
+        } else if (idx === selectedIdx) {
+          btn.classList.add("bg-rose-100", "border-rose-400", "text-rose-900", "opacity-80");
+        } else {
+          btn.classList.add("bg-slate-50", "border-slate-200", "opacity-50");
+        }
+      });
+
+      if (isCorrect) {
+        correctCount++;
+        correctCountElem.textContent = correctCount;
+        triggerCelebration(40);
+        feedbackTitle.innerHTML = `<span>✨</span> ¡Excelente respuesta, Mamá!`;
+        feedbackBox.classList.remove("bg-amber-50", "border-amber-300");
+        feedbackBox.classList.add("bg-emerald-50", "border-emerald-300");
+      } else {
+        incorrectCount++;
+        incorrectCountElem.textContent = incorrectCount;
+
+        if(currentQ.category) {
+            erroresPorCategoria[currentQ.category] = (erroresPorCategoria[currentQ.category] || 0) + 1;
+        }
+
+        const frase = frasesAliento[Math.floor(Math.random() * frasesAliento.length)];
+        feedbackTitle.innerHTML = `<span>💡</span> ${frase}`;
+        feedbackBox.classList.remove("bg-emerald-50", "border-emerald-300");
+        feedbackBox.classList.add("bg-amber-50", "border-amber-300");
+      }
+
+      renderExplanation();
+      feedbackBox.classList.remove("hidden");
+
+      if (currentIndex === currentQuestions.length - 1) {
+          nextBtn.innerHTML = "Ver mis Resultados 🏆";
+      } else {
+          nextBtn.innerHTML = "Siguiente Pregunta ➔";
+      }
+
+      setTimeout(() => {
+        feedbackBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 150);
+    }
+
+    function triggerCelebration(particles) {
+      confetti({
+        particleCount: particles,
+        spread: 60,
+        origin: { y: 0.8 },
+        colors: ['#10b981', '#f43f5e', '#a855f7', '#fbbf24']
+      });
+    }
+
+    nextBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      currentIndex++;
+      if (currentIndex < currentQuestions.length) {
+        loadQuestion();
+      } else {
+        showResults();
+      }
+    });
+
+    finishEarlyBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      showResults();
+    });
+
+    function showResults() {
+      header.classList.add("hidden");
+      quizContainer.classList.add("hidden");
+
+      resultsContainer.classList.remove("hidden");
+      resultsContainer.classList.add("flex");
+
+      const totalRespondidas = correctCount + incorrectCount;
+      const porcentaje = totalRespondidas === 0 ? 0 : Math.round((correctCount / totalRespondidas) * 100);
+
+      document.getElementById("final-correct").textContent = correctCount;
+      document.getElementById("final-incorrect").textContent = incorrectCount;
+      document.getElementById("donut-percentage").textContent = `${porcentaje}%`;
+
+      const circle = document.getElementById("donut-chart");
+      circle.style.strokeDasharray = `${porcentaje}, 100`;
+
+      const diagnosticTitle = document.getElementById("diagnostic-title");
+      const diagnosticText = document.getElementById("diagnostic-text");
+      const diagnosticIcon = document.getElementById("diagnostic-icon");
+      const diagnosticBox = document.getElementById("diagnostic-box");
+      const mainTitle = document.getElementById("result-main-title");
+
+      let peorTema = "";
+      let maxErrores = 0;
+      for (const [tema, errores] of Object.entries(erroresPorCategoria)) {
+          if (errores > maxErrores) {
+              maxErrores = errores;
+              peorTema = tema;
+          }
+      }
+
+      diagnosticBox.className = "w-full bg-white border-2 border-slate-200 rounded-2xl p-5 shadow-sm mb-6 text-left";
+
+      if (totalRespondidas === 0) {
+        circle.style.stroke = "#cbd5e1";
+        mainTitle.textContent = "¡Ups!";
+        diagnosticIcon.textContent = "🤔";
+        diagnosticTitle.textContent = "Sin respuestas";
+        diagnosticText.textContent = "Mamá, le diste a finalizar sin contestar. ¡Anímate a intentarlo!";
+      } else if (porcentaje >= 85) {
+        circle.style.stroke = "#10b981";
+        mainTitle.textContent = "¡Triunfo total, Mamá! 🎉";
+        diagnosticBox.classList.add("bg-emerald-50", "border-emerald-200");
+        diagnosticTitle.classList.add("text-emerald-800");
+        diagnosticIcon.textContent = "🌟";
+        diagnosticTitle.textContent = "¡Estás lista para ese examen!";
+        diagnosticText.textContent = "Dominas el balotario a la perfección. Hemos revisado tus respuestas y has entendido muy bien todas las reglas. ¡Ese brevete ya tiene tu nombre!";
+
+        var duration = 3 * 1000;
+        var end = Date.now() + duration;
+        (function frame() {
+          confetti({ particleCount: 5, angle: 60, spread: 55, origin: { x: 0 }, colors: ['#10b981', '#fbbf24'] });
+          confetti({ particleCount: 5, angle: 120, spread: 55, origin: { x: 1 }, colors: ['#10b981', '#f43f5e'] });
+          if (Date.now() < end) requestAnimationFrame(frame);
+        }());
+
+      } else if (porcentaje >= 65) {
+        circle.style.stroke = "#f59e0b";
+        mainTitle.textContent = "¡Vas súper bien! 👏";
+        diagnosticBox.classList.add("bg-amber-50", "border-amber-200");
+        diagnosticTitle.classList.add("text-amber-800");
+        diagnosticIcon.textContent = "📈";
+        diagnosticTitle.textContent = "Un consejo con cariño:";
+
+        if(peorTema !== "") {
+            diagnosticText.textContent = `Tienes una gran memoria. Sin embargo, vi que te confundiste un poquito en las preguntas sobre "${peorTema}". En el próximo intento, lee esas con un poquito más de calma. ¡Casi rozas la perfección!`;
+        } else {
+            diagnosticText.textContent = "Tienes una base muy sólida. Solo necesitas repasar los errores para asegurar la nota máxima.";
+        }
+      } else {
+        circle.style.stroke = "#f43f5e";
+        mainTitle.textContent = "¡A seguir practicando! 💪";
+        diagnosticBox.classList.add("bg-rose-50", "border-rose-200");
+        diagnosticTitle.classList.add("text-rose-800");
+        diagnosticIcon.textContent = "❤️";
+        diagnosticTitle.textContent = "El secreto es no rendirse:";
+
+        if(peorTema !== "") {
+             diagnosticText.textContent = `Mamita hermosa, hoy el tema de "${peorTema}" te dio batalla. ¡Pero para eso es este simulador! Usa el botón de 🔄 para leer otros ejemplos de explicación que te he puesto en cada pregunta, y toca las palabras celestes si hay algún término que no conozcas. ¡Yo creo en ti!`;
+        } else {
+             diagnosticText.textContent = "¡No te preocupes! Lee con calma las explicaciones e inténtalo otra vez. Cada intento te hace más experta.";
+        }
+      }
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function restartQuiz(aleatorio = false) {
+      modoAleatorio = aleatorio;
+      currentQuestions = [...baseQuestions];
+      if (modoAleatorio) shuffleArray(currentQuestions);
+
+      currentIndex = 0; correctCount = 0; incorrectCount = 0;
+      correctCountElem.textContent = "0"; incorrectCountElem.textContent = "0";
+
+      for (let key in erroresPorCategoria) {
+          erroresPorCategoria[key] = 0;
+      }
+
+      resultsContainer.classList.add("hidden");
+      resultsContainer.classList.remove("flex");
+
+      header.classList.remove("hidden");
+      quizContainer.classList.remove("hidden");
+
+      loadQuestion();
+    }
+
+    // Iniciar la app
+    restartQuiz(false);
+  </script>
+</body>
+</html>
