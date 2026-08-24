@@ -139,14 +139,52 @@
 
   <main class="w-full max-w-2xl glass-card rounded-3xl p-4 sm:p-7 mt-2 mb-6 relative">
 
+    <!-- SELECCIÓN DE MODO DE EXAMEN -->
+    <section id="mode-selection" class="text-center">
+      <h1 class="text-lg sm:text-2xl font-extrabold text-rose-500 uppercase tracking-wide mb-1">
+        🚗 ¡A POR TU BREVETE MAMÁ!
+      </h1>
+      <p class="text-slate-500 text-sm sm:text-base font-bold mb-4">Elige cómo quieres practicar hoy:</p>
+
+      <div class="space-y-3 text-left">
+        <button onclick="iniciarModo('rapido')" type="button" class="w-full p-4 rounded-2xl border-2 border-transparent bg-white shadow-sm hover:border-emerald-300 active:scale-[0.98] transition-all flex items-center gap-3">
+          <span class="text-3xl">⚡</span>
+          <span>
+            <span class="block text-lg font-extrabold text-slate-800">Examen Rápido</span>
+            <span class="block text-sm text-slate-500 font-medium">10 preguntas al azar, sin apuro. Ideal para un repaso cortito.</span>
+          </span>
+        </button>
+
+        <button onclick="iniciarModo('simulacro')" type="button" class="w-full p-4 rounded-2xl border-2 border-transparent bg-white shadow-sm hover:border-amber-300 active:scale-[0.98] transition-all flex items-center gap-3">
+          <span class="text-3xl">🎓</span>
+          <span>
+            <span class="block text-lg font-extrabold text-slate-800">Simulacro Real</span>
+            <span class="block text-sm text-slate-500 font-medium">40 preguntas y 40 minutos, igual que el examen real. Se aprueba con 35 o más correctas.</span>
+          </span>
+        </button>
+
+        <button onclick="iniciarModo('practica')" type="button" class="w-full p-4 rounded-2xl border-2 border-transparent bg-white shadow-sm hover:border-indigo-300 active:scale-[0.98] transition-all flex items-center gap-3">
+          <span class="text-3xl">📚</span>
+          <span>
+            <span class="block text-lg font-extrabold text-slate-800">Práctica Completa</span>
+            <span class="block text-sm text-slate-500 font-medium">Las 200 preguntas del balotario, sin límite de tiempo, para repasar con calma.</span>
+          </span>
+        </button>
+      </div>
+    </section>
+
     <!-- ENCABEZADO -->
-    <header id="quiz-header" class="mb-3 relative">
+    <header id="quiz-header" class="mb-3 relative hidden">
       <button onclick="activarModoAleatorio()" type="button" aria-label="Mezclar preguntas" class="absolute top-0 right-0 w-11 h-11 sm:w-12 sm:h-12 flex items-center justify-center bg-indigo-500 text-white rounded-full shadow-md active:scale-95 hover:bg-indigo-600 transition-all text-xl z-10">
         🔀
       </button>
       <h1 class="text-lg sm:text-2xl font-extrabold text-rose-500 uppercase text-center sm:text-left tracking-wide pr-12 sm:pr-14 mb-2">
         🚗 ¡A POR TU BREVETE MAMÁ!
       </h1>
+
+      <div id="timer-row" class="hidden justify-center items-center gap-2 bg-amber-50 text-amber-700 font-extrabold rounded-lg py-1.5 mb-2 text-base border border-amber-200">
+        ⏱ <span id="timer-display">40:00</span>
+      </div>
 
       <div class="flex text-sm sm:text-base justify-between items-center bg-white/80 px-3 py-1.5 rounded-xl shadow-sm border border-rose-50 mb-2 font-bold">
         <span class="text-emerald-500">✔ Bien: <span id="correct-count">0</span></span>
@@ -161,7 +199,7 @@
     </header>
 
     <!-- ZONA CENTRAL DE PREGUNTAS -->
-    <section id="quiz-container">
+    <section id="quiz-container" class="hidden">
 
       <div id="image-container" class="hidden flex justify-center items-center mb-2 max-h-24 sm:max-h-32 overflow-hidden"></div>
 
@@ -199,7 +237,15 @@
     <!-- PANTALLA FINAL (DIAGNÓSTICO) -->
     <section id="results-container" class="hidden flex-col items-center justify-center text-center py-6">
       <h2 class="text-3xl font-extrabold text-rose-500 mb-2" id="result-main-title">¡Misión Cumplida, Mamá! 🎉</h2>
-      <p class="text-slate-500 text-sm sm:text-base mb-6 font-bold">Tu diagnóstico de hoy:</p>
+      <p class="text-slate-500 text-sm sm:text-base mb-4 font-bold">Tu diagnóstico de hoy:</p>
+
+      <div id="simulacro-banner" class="hidden w-full mb-4 p-4 rounded-2xl border-2 text-left">
+        <div class="flex items-center gap-2">
+          <span class="text-2xl" id="simulacro-banner-icon"></span>
+          <span class="font-extrabold text-lg" id="simulacro-banner-title"></span>
+        </div>
+        <p class="text-sm mt-1 text-slate-600" id="simulacro-banner-text"></p>
+      </div>
 
       <div class="flex flex-col sm:flex-row w-full items-center justify-center gap-6 mb-6">
         <div class="relative w-36 h-36 shrink-0">
@@ -231,12 +277,15 @@
 
       <div class="flex flex-col sm:flex-row gap-3 w-full max-w-md">
         <button onclick="restartQuiz(false)" type="button" class="flex-1 py-3.5 bg-white border-2 border-emerald-400 text-emerald-500 text-sm font-bold rounded-xl shadow-sm hover:bg-emerald-50 transition-colors">
-          Repetir Orden
+          Repetir
         </button>
         <button onclick="activarModoAleatorio()" type="button" class="flex-1 py-3.5 bg-gradient-to-r from-indigo-500 to-purple-600 text-white text-sm font-bold rounded-xl shadow-md hover:shadow-lg transition-all">
-          Nuevo Mezclado 🔀
+          Nueva Tanda 🔀
         </button>
       </div>
+      <button onclick="volverAModoSeleccion()" type="button" class="mt-3 w-full max-w-md py-3 bg-slate-100 text-slate-600 text-sm font-bold rounded-xl hover:bg-slate-200 transition-colors">
+        ⬅️ Elegir otro modo de examen
+      </button>
     </section>
 
   </main>
@@ -4675,6 +4724,10 @@
     let hasAnswered = false;
     let modoAleatorio = false;
     let currentExplanationIndex = 0;
+    let modoExamen = 'practica'; // 'rapido' | 'simulacro' | 'practica'
+    let timerInterval = null;
+    let tiempoRestante = 0;
+    const TIEMPO_SIMULACRO = 40 * 60; // 40 minutos, igual que el examen real
 
     let erroresPorCategoria = {
         "Señales": 0,
@@ -4697,9 +4750,12 @@
     };
 
     // Referencias DOM
+    const modeSelection = document.getElementById("mode-selection");
     const header = document.getElementById("quiz-header");
     const quizContainer = document.getElementById("quiz-container");
     const resultsContainer = document.getElementById("results-container");
+    const timerRow = document.getElementById("timer-row");
+    const timerDisplay = document.getElementById("timer-display");
 
     const questionText = document.getElementById("question-text");
     const imageContainer = document.getElementById("image-container");
@@ -4724,14 +4780,102 @@
       }
     }
 
+    function shuffledSample(array, n) {
+      const copia = [...array];
+      shuffleArray(copia);
+      return copia.slice(0, Math.min(n, copia.length));
+    }
+
+    function iniciarModo(modo) {
+      modoExamen = modo;
+      detenerTemporizador();
+
+      if (modo === 'rapido') {
+        currentQuestions = shuffledSample(baseQuestions, 10);
+        modoAleatorio = true;
+      } else if (modo === 'simulacro') {
+        currentQuestions = shuffledSample(baseQuestions, 40);
+        modoAleatorio = true;
+      } else {
+        currentQuestions = [...baseQuestions];
+        modoAleatorio = false;
+      }
+
+      currentIndex = 0; correctCount = 0; incorrectCount = 0;
+      correctCountElem.textContent = "0"; incorrectCountElem.textContent = "0";
+      for (let key in erroresPorCategoria) { erroresPorCategoria[key] = 0; }
+
+      modeSelection.classList.add("hidden");
+      resultsContainer.classList.add("hidden");
+      resultsContainer.classList.remove("flex");
+      header.classList.remove("hidden");
+      quizContainer.classList.remove("hidden");
+
+      if (modo === 'simulacro') {
+        timerRow.classList.remove("hidden");
+        timerRow.classList.add("flex");
+        timerRow.className = "flex justify-center items-center gap-2 bg-amber-50 text-amber-700 font-extrabold rounded-lg py-1.5 mb-2 text-base border border-amber-200";
+        iniciarTemporizador(TIEMPO_SIMULACRO);
+      } else {
+        timerRow.classList.add("hidden");
+        timerRow.classList.remove("flex");
+      }
+
+      loadQuestion();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function volverAModoSeleccion() {
+      detenerTemporizador();
+      header.classList.add("hidden");
+      quizContainer.classList.add("hidden");
+      resultsContainer.classList.add("hidden");
+      resultsContainer.classList.remove("flex");
+      modeSelection.classList.remove("hidden");
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function iniciarTemporizador(segundos) {
+      tiempoRestante = segundos;
+      actualizarTimerDisplay();
+      timerInterval = setInterval(() => {
+        tiempoRestante--;
+        actualizarTimerDisplay();
+        if (tiempoRestante <= 0) {
+          detenerTemporizador();
+          Swal.fire({
+            title: '⏰ ¡Se acabó el tiempo!',
+            text: 'Así funciona el examen real, mamá. Veamos cómo te fue.',
+            icon: 'info',
+            confirmButtonColor: '#f59e0b'
+          }).then(() => { showResults(); });
+        }
+      }, 1000);
+    }
+
+    function detenerTemporizador() {
+      if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+    }
+
+    function actualizarTimerDisplay() {
+      const m = Math.max(0, Math.floor(tiempoRestante / 60));
+      const s = Math.max(0, tiempoRestante % 60);
+      timerDisplay.textContent = `${m}:${s.toString().padStart(2, '0')}`;
+      if (tiempoRestante <= 60) {
+        timerRow.className = "flex justify-center items-center gap-2 bg-rose-50 text-rose-600 font-extrabold rounded-lg py-1.5 mb-2 text-base border border-rose-200";
+      }
+    }
+
     function activarModoAleatorio() {
       Swal.fire({
-        title: '¡Modo Simulacro! 🔀',
-        text: 'Las preguntas aparecerán desordenadas. ¡Concéntrate, tú puedes mamita!',
+        title: '¡Nueva tanda! 🔀',
+        text: modoExamen === 'practica'
+          ? 'Las 200 preguntas aparecerán desordenadas. ¡Concéntrate, tú puedes mamita!'
+          : 'Vamos con un nuevo grupo de preguntas al azar. ¡Tú puedes!',
         icon: 'success',
         confirmButtonColor: '#8b5cf6'
       }).then(() => {
-        restartQuiz(true);
+        iniciarModo(modoExamen);
       });
     }
 
@@ -4881,6 +5025,7 @@
     });
 
     function showResults() {
+      detenerTemporizador();
       header.classList.add("hidden");
       quizContainer.classList.add("hidden");
 
@@ -4896,6 +5041,22 @@
 
       const circle = document.getElementById("donut-chart");
       circle.style.strokeDasharray = `${porcentaje}, 100`;
+
+      const simulacroBanner = document.getElementById("simulacro-banner");
+      if (modoExamen === 'simulacro') {
+        const aprobado = correctCount >= 35;
+        simulacroBanner.classList.remove("hidden");
+        simulacroBanner.className = `w-full mb-4 p-4 rounded-2xl border-2 text-left ${aprobado ? 'bg-emerald-50 border-emerald-300' : 'bg-rose-50 border-rose-300'}`;
+        document.getElementById("simulacro-banner-icon").textContent = aprobado ? '🎉' : '📖';
+        const bannerTitle = document.getElementById("simulacro-banner-title");
+        bannerTitle.textContent = aprobado ? `¡APROBADO! ${correctCount}/40 correctas` : `Aún no, mamá: ${correctCount}/40 correctas`;
+        bannerTitle.className = `font-extrabold text-lg ${aprobado ? 'text-emerald-700' : 'text-rose-700'}`;
+        document.getElementById("simulacro-banner-text").textContent = aprobado
+          ? 'Necesitabas 35 de 40 y las superaste. ¡Así se hace, este examen ya casi es tuyo!'
+          : 'En el examen real se necesitan 35 de 40 correctas para aprobar. Repasa los temas marcados abajo y vuelve a intentarlo, ¡cada vez te sale mejor!';
+      } else {
+        simulacroBanner.classList.add("hidden");
+      }
 
       const diagnosticTitle = document.getElementById("diagnostic-title");
       const diagnosticText = document.getElementById("diagnostic-text");
@@ -4969,9 +5130,14 @@
     }
 
     function restartQuiz(aleatorio = false) {
-      modoAleatorio = aleatorio;
-      currentQuestions = [...baseQuestions];
-      if (modoAleatorio) shuffleArray(currentQuestions);
+      detenerTemporizador();
+
+      if (modoExamen === 'practica') {
+        modoAleatorio = aleatorio;
+        currentQuestions = [...baseQuestions];
+        if (modoAleatorio) shuffleArray(currentQuestions);
+      }
+      // Para 'rapido' y 'simulacro', se repite el mismo grupo de preguntas ya sorteado
 
       currentIndex = 0; correctCount = 0; incorrectCount = 0;
       correctCountElem.textContent = "0"; incorrectCountElem.textContent = "0";
@@ -4986,11 +5152,17 @@
       header.classList.remove("hidden");
       quizContainer.classList.remove("hidden");
 
+      if (modoExamen === 'simulacro') {
+        timerRow.classList.remove("hidden");
+        timerRow.classList.add("flex");
+        timerRow.className = "flex justify-center items-center gap-2 bg-amber-50 text-amber-700 font-extrabold rounded-lg py-1.5 mb-2 text-base border border-amber-200";
+        iniciarTemporizador(TIEMPO_SIMULACRO);
+      }
+
       loadQuestion();
     }
 
-    // Iniciar la app
-    restartQuiz(false);
+    // La app inicia mostrando la selección de modo (ver #mode-selection)
   </script>
 </body>
 </html>
