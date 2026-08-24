@@ -171,14 +171,23 @@
           </span>
         </button>
       </div>
+
+      <button onclick="abrirBuscador()" type="button" class="mt-4 w-full py-3 bg-sky-50 border-2 border-sky-200 text-sky-700 text-sm sm:text-base font-bold rounded-2xl hover:bg-sky-100 transition-colors flex items-center justify-center gap-2">
+        🔍 Buscar una palabra en las 200 preguntas
+      </button>
     </section>
 
     <!-- ENCABEZADO -->
     <header id="quiz-header" class="mb-3 relative hidden">
-      <button onclick="activarModoAleatorio()" type="button" aria-label="Mezclar preguntas" class="absolute top-0 right-0 w-11 h-11 sm:w-12 sm:h-12 flex items-center justify-center bg-indigo-500 text-white rounded-full shadow-md active:scale-95 hover:bg-indigo-600 transition-all text-xl z-10">
-        🔀
-      </button>
-      <h1 class="text-lg sm:text-2xl font-extrabold text-rose-500 uppercase text-center sm:text-left tracking-wide pr-12 sm:pr-14 mb-2">
+      <div class="absolute top-0 right-0 flex gap-2 z-10">
+        <button onclick="abrirBuscador()" type="button" aria-label="Buscar preguntas" class="w-11 h-11 sm:w-12 sm:h-12 flex items-center justify-center bg-sky-500 text-white rounded-full shadow-md active:scale-95 hover:bg-sky-600 transition-all text-xl">
+          🔍
+        </button>
+        <button onclick="activarModoAleatorio()" type="button" aria-label="Mezclar preguntas" class="w-11 h-11 sm:w-12 sm:h-12 flex items-center justify-center bg-indigo-500 text-white rounded-full shadow-md active:scale-95 hover:bg-indigo-600 transition-all text-xl">
+          🔀
+        </button>
+      </div>
+      <h1 class="text-lg sm:text-2xl font-extrabold text-rose-500 uppercase text-center sm:text-left tracking-wide pr-24 sm:pr-28 mb-2">
         🚗 ¡A POR TU BREVETE MAMÁ!
       </h1>
 
@@ -289,6 +298,23 @@
     </section>
 
   </main>
+
+  <!-- MODAL BUSCADOR -->
+  <div id="search-overlay" class="hidden fixed inset-0 bg-slate-900/60 z-50 items-start sm:items-center justify-center p-3 sm:p-6" style="backdrop-filter:blur(2px)">
+    <div class="bg-white rounded-3xl shadow-2xl w-full max-w-xl mt-8 sm:mt-0 max-h-[85vh] flex flex-col overflow-hidden">
+      <div class="flex items-center gap-2 p-4 border-b border-slate-100">
+        <span class="text-2xl">🔍</span>
+        <input id="search-input" type="text" placeholder="Buscar palabra clave en las 200 preguntas..." class="flex-1 min-w-0 text-base sm:text-lg font-semibold text-slate-800 placeholder-slate-400 outline-none" autocomplete="off">
+        <button onclick="cerrarBuscador()" type="button" aria-label="Cerrar buscador" class="w-9 h-9 shrink-0 flex items-center justify-center rounded-full hover:bg-slate-100 text-slate-500 text-xl font-bold">✕</button>
+      </div>
+      <div id="search-results-list" class="overflow-y-auto flex-1 p-2"></div>
+      <div class="px-4 py-2 border-t border-slate-100 text-xs text-slate-400 flex items-center gap-3">
+        <span>↑↓ moverte</span>
+        <span>Enter ir a la pregunta</span>
+        <span>Esc cerrar</span>
+      </div>
+    </div>
+  </div>
 
   <script>
     // =============================================================
@@ -4818,6 +4844,9 @@
     const resultsContainer = document.getElementById("results-container");
     const timerRow = document.getElementById("timer-row");
     const timerDisplay = document.getElementById("timer-display");
+    const searchOverlay = document.getElementById("search-overlay");
+    const searchInput = document.getElementById("search-input");
+    const searchResultsList = document.getElementById("search-results-list");
 
     const questionText = document.getElementById("question-text");
     const imageContainer = document.getElementById("image-container");
@@ -4834,6 +4863,195 @@
     const questionIndexText = document.getElementById("question-index-text");
     const correctCountElem = document.getElementById("correct-count");
     const incorrectCountElem = document.getElementById("incorrect-count");
+
+    // =============================================================
+    // BUSCADOR DE PREGUNTAS (estilo Notion / Obsidian)
+    // =============================================================
+    const mapaAcentos = { 'á':'a','é':'e','í':'i','ó':'o','ú':'u','Á':'a','É':'e','Í':'i','Ó':'o','Ú':'u','ñ':'n','Ñ':'n','ü':'u','Ü':'u' };
+    // Quita acentos manteniendo la MISMA longitud de cadena, para que los índices
+    // encontrados en el texto normalizado sigan apuntando al lugar correcto en el texto original.
+    function normalizarBusqueda(str) {
+      return str.toLowerCase().split('').map(c => mapaAcentos[c] || c).join('');
+    }
+
+    function escaparHtml(str) {
+      return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    // Resalta la coincidencia dentro de un fragmento de texto, en celeste cyan brillante
+    function resaltarCoincidencia(texto, pos, len) {
+      const inicio = Math.max(0, pos - 35);
+      const fin = Math.min(texto.length, pos + len + 45);
+      const prefijo = inicio > 0 ? '…' : '';
+      const sufijo = fin < texto.length ? '…' : '';
+      const antes = escaparHtml(texto.slice(inicio, pos));
+      const coincide = escaparHtml(texto.slice(pos, pos + len));
+      const despues = escaparHtml(texto.slice(pos + len, fin));
+      return `${prefijo}${antes}<mark class="bg-cyan-300 text-slate-900 rounded px-0.5 font-extrabold" style="box-shadow:0 0 6px rgba(34,211,238,0.75)">${coincide}</mark>${despues}${sufijo}`;
+    }
+
+    const MAX_RESULTADOS_BUSQUEDA = 50;
+    let searchResultadosActuales = [];
+    let searchIndiceActivo = -1;
+
+    // Busca la palabra clave en la pregunta y en sus 4 opciones (ignora acentos y mayúsculas)
+    function buscarEnPreguntas(query) {
+      const q = normalizarBusqueda(query.trim());
+      if (!q) return [];
+      const resultados = [];
+      const etiquetasOpcion = ['Opción a', 'Opción b', 'Opción c', 'Opción d'];
+      for (let idx = 0; idx < baseQuestions.length; idx++) {
+        const preg = baseQuestions[idx];
+        const campos = [{ texto: preg.question, tipo: 'Pregunta' }];
+        preg.options.forEach((op, i) => campos.push({ texto: op, tipo: etiquetasOpcion[i] }));
+        for (const campo of campos) {
+          const pos = normalizarBusqueda(campo.texto).indexOf(q);
+          if (pos !== -1) {
+            resultados.push({ idx, id: preg.id, categoria: preg.category, tipo: campo.tipo, texto: campo.texto, pos, len: q.length });
+            break;
+          }
+        }
+        if (resultados.length >= MAX_RESULTADOS_BUSQUEDA) break;
+      }
+      return resultados;
+    }
+
+    function marcarResultadoActivo(i) {
+      const items = searchResultsList.querySelectorAll('.search-result-item');
+      items.forEach((el, idx) => {
+        if (idx === i) {
+          el.classList.add('bg-sky-50', 'border-sky-400');
+          el.scrollIntoView({ block: 'nearest' });
+        } else {
+          el.classList.remove('bg-sky-50', 'border-sky-400');
+        }
+      });
+      searchIndiceActivo = items.length > 0 ? i : -1;
+    }
+
+    function renderizarResultadosBusqueda(resultados, query) {
+      searchResultsList.innerHTML = '';
+      searchIndiceActivo = -1;
+
+      if (!query.trim()) {
+        searchResultsList.innerHTML = `<p class="text-slate-400 text-center text-sm py-8 px-4">Escribe una palabra clave para buscar entre las 200 preguntas y sus opciones...</p>`;
+        return;
+      }
+      if (resultados.length === 0) {
+        searchResultsList.innerHTML = `<p class="text-slate-400 text-center text-sm py-8 px-4">No se encontraron coincidencias para "${escaparHtml(query)}".</p>`;
+        return;
+      }
+
+      resultados.forEach((r) => {
+        const div = document.createElement('div');
+        div.className = 'search-result-item p-3 rounded-xl cursor-pointer border-2 border-transparent hover:bg-sky-50 transition-colors';
+        div.innerHTML = `
+          <div class="flex items-center gap-2 mb-1">
+            <span class="text-xs font-bold text-white bg-indigo-500 rounded-full px-2 py-0.5">#${r.id}</span>
+            <span class="text-xs font-bold text-slate-400">${r.tipo}</span>
+          </div>
+          <p class="text-sm sm:text-base text-slate-700 leading-snug">${resaltarCoincidencia(r.texto, r.pos, r.len)}</p>
+        `;
+        div.addEventListener('click', () => saltarAPregunta(r.idx));
+        searchResultsList.appendChild(div);
+      });
+
+      if (resultados.length >= MAX_RESULTADOS_BUSQUEDA) {
+        const aviso = document.createElement('p');
+        aviso.className = 'text-slate-400 text-center text-xs py-2';
+        aviso.textContent = 'Mostrando los primeros 50 resultados. Sigue escribiendo para afinar tu búsqueda.';
+        searchResultsList.appendChild(aviso);
+      }
+
+      marcarResultadoActivo(0);
+    }
+
+    function abrirBuscador() {
+      searchOverlay.classList.remove('hidden');
+      searchOverlay.classList.add('flex');
+      searchInput.value = '';
+      renderizarResultadosBusqueda([], '');
+      setTimeout(() => searchInput.focus(), 60);
+    }
+
+    function cerrarBuscador() {
+      searchOverlay.classList.add('hidden');
+      searchOverlay.classList.remove('flex');
+    }
+
+    // Lleva al usuario directamente a la pregunta elegida, en modo práctica libre
+    function saltarAPregunta(idxEnBancoCompleto) {
+      const irAlaPregunta = () => {
+        detenerTemporizador();
+        modoExamen = 'practica';
+        currentQuestions = [...baseQuestions];
+        modoAleatorio = false;
+        currentIndex = idxEnBancoCompleto;
+        correctCount = 0; incorrectCount = 0;
+        correctCountElem.textContent = "0"; incorrectCountElem.textContent = "0";
+        for (let key in erroresPorCategoria) { erroresPorCategoria[key] = 0; }
+
+        cerrarBuscador();
+        modeSelection.classList.add('hidden');
+        resultsContainer.classList.add('hidden');
+        resultsContainer.classList.remove('flex');
+        header.classList.remove('hidden');
+        quizContainer.classList.remove('hidden');
+        timerRow.classList.add('hidden');
+        timerRow.classList.remove('flex');
+
+        loadQuestion();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      };
+
+      if (modoExamen === 'simulacro' && timerInterval) {
+        Swal.fire({
+          title: '¿Salir del simulacro? ⏱',
+          text: 'Si vas a esa pregunta, se detendrá tu simulacro cronometrado actual.',
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonText: 'Sí, ir a la pregunta',
+          cancelButtonText: 'Seguir en el simulacro',
+          confirmButtonColor: '#0ea5e9',
+          cancelButtonColor: '#94a3b8'
+        }).then((resultado) => {
+          if (resultado.isConfirmed) irAlaPregunta();
+        });
+      } else {
+        irAlaPregunta();
+      }
+    }
+
+    searchInput.addEventListener('input', () => {
+      const query = searchInput.value;
+      searchResultadosActuales = buscarEnPreguntas(query);
+      renderizarResultadosBusqueda(searchResultadosActuales, query);
+    });
+
+    searchInput.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        if (searchResultadosActuales.length === 0) return;
+        const siguiente = searchIndiceActivo < 0 ? 0 : Math.min(searchIndiceActivo + 1, searchResultadosActuales.length - 1);
+        marcarResultadoActivo(siguiente);
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        if (searchResultadosActuales.length === 0) return;
+        const anterior = searchIndiceActivo < 0 ? 0 : Math.max(searchIndiceActivo - 1, 0);
+        marcarResultadoActivo(anterior);
+      } else if (e.key === 'Enter') {
+        e.preventDefault();
+        if (searchIndiceActivo >= 0 && searchResultadosActuales[searchIndiceActivo]) {
+          saltarAPregunta(searchResultadosActuales[searchIndiceActivo].idx);
+        }
+      } else if (e.key === 'Escape') {
+        cerrarBuscador();
+      }
+    });
+
+    searchOverlay.addEventListener('click', (e) => {
+      if (e.target === searchOverlay) cerrarBuscador();
+    });
 
     function shuffleArray(array) {
       for (let i = array.length - 1; i > 0; i--) {
