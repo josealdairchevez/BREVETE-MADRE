@@ -694,8 +694,8 @@
         <rect x="18" y="58" width="45" height="26" rx="11" fill="url(#gradPurpleCar3d)"/>
       </svg>`;
     }
-    const iconoAngostamiento = `<path d="M 45 30 Q 60 55 45 80" stroke="#1e293b" stroke-width="6" fill="none" stroke-linecap="round"/><path d="M 75 30 Q 60 55 75 80" stroke="#1e293b" stroke-width="6" fill="none" stroke-linecap="round"/>`;
-    const iconoResalto = `<path d="M 24 70 L 42 70 Q 60 38 78 70 L 96 70" stroke="#1e293b" stroke-width="7" fill="none" stroke-linecap="round"/>`;
+    const iconoAngostamiento = `<path d="M 28 22 L 45 22 L 53 55 L 45 88 L 28 88 L 37 55 Z" fill="#1e293b"/><path d="M 92 22 L 75 22 L 67 55 L 75 88 L 92 88 L 83 55 Z" fill="#1e293b"/><line x1="60" y1="24" x2="60" y2="86" stroke="#1e293b" stroke-width="3" stroke-dasharray="7 6"/>`;
+    const iconoResalto = `<path d="M 22 72 L 38 72 Q 38 45 60 45 Q 82 45 82 72 L 98 72 L 98 80 L 22 80 Z" fill="#1e293b"/>`;
 
     // Escena: colores de las marcas en el pavimento (amarillo centro, blanco a los lados)
     function escenaColoresPavimento3D() {
@@ -855,24 +855,46 @@
         <rect x="3" y="3" width="114" height="144" rx="24" fill="url(#gradCardSky)"/>
         ${sombraSuelo(60,134,32,6)}
         <rect x="20" y="15" width="80" height="90" rx="8" fill="url(#gradWhite3d)" stroke="#1e293b" stroke-width="2"/>
-        <path d="M 45 30 Q 30 50 45 65 M 38 58 L 45 65 L 52 58" stroke="#1e293b" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-        <path d="M 75 30 Q 60 50 75 65 M 68 58 L 75 65 L 82 58" stroke="#1e293b" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M 45 75 Q 30 75 30 50 Q 30 26 47 22 M 39 30 L 47 22 L 52 33" stroke="#1e293b" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M 75 75 Q 60 75 60 50 Q 60 26 77 22 M 69 30 L 77 22 L 82 33" stroke="#1e293b" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
         <rect x="30" y="108" width="60" height="22" rx="5" fill="url(#gradWhite3d)" stroke="#1e293b" stroke-width="2"/>
         <text x="60" y="124" font-family="Quicksand" font-weight="800" font-size="14" fill="#1e293b" text-anchor="middle">SOLO</text>
+      </svg>`;
+    }
+
+    // Señal rectangular blanca genérica (informativa de carril, sin texto), tipo R-5-x
+    function senalRectangular3D(contenido) {
+      return `<svg viewBox="0 0 120 140" class="w-24 h-28 sm:w-28 sm:h-32 icon-3d">
+        <rect x="3" y="3" width="114" height="134" rx="24" fill="url(#gradCardSky)"/>
+        ${sombraSuelo(60,124,32,6)}
+        <rect x="20" y="15" width="80" height="100" rx="8" fill="url(#gradWhite3d)" stroke="#1e293b" stroke-width="3"/>
+        ${contenido}
+      </svg>`;
+    }
+
+    // Señal R-4 (rombo con franja diagonal negra y dos rectángulos amarillos)
+    function senalR4_3D() {
+      return `<svg viewBox="0 0 120 120" class="w-24 h-24 sm:w-28 sm:h-28 icon-3d">
+        <rect x="3" y="3" width="114" height="114" rx="24" fill="url(#gradCardSky)"/>
+        ${sombraSuelo(60,104,32,6)}
+        <polygon points="60,14 106,60 60,106 14,60" fill="url(#gradWhite3d)" stroke="#1e293b" stroke-width="5"/>
+        <rect x="38" y="34" width="20" height="34" fill="#fde047" stroke="#1e293b" stroke-width="2"/>
+        <rect x="60" y="50" width="20" height="34" fill="#fde047" stroke="#1e293b" stroke-width="2"/>
+        <polygon points="24,78 88,32 98,46 34,92" fill="#1e293b"/>
       </svg>`;
     }
 
     // Íconos interiores para señales circulares R-xx
     const iconoVanTachada = `<path d="M 30 55 L 30 42 Q 30 32 40 32 L 60 32 Q 70 32 70 42 L 70 55 Z" fill="#1e293b"/><rect x="24" y="55" width="52" height="8" rx="3" fill="#1e293b"/><circle cx="36" cy="65" r="6" fill="#1e293b"/><circle cx="64" cy="65" r="6" fill="#1e293b"/>`;
     const iconoBarraNoEntre = `<rect x="20" y="52" width="60" height="16" rx="4" fill="#fff"/>`;
-    const iconoDeslizante = `<path d="M 28 62 Q 45 42 62 62" stroke="#1e293b" stroke-width="4" fill="none" stroke-linecap="round"/><rect x="42" y="34" width="22" height="14" rx="3" fill="#1e293b" transform="rotate(12 53 41)"/>`;
+    const iconoDeslizante = `<path d="M 18 68 Q 33 50 48 65 Q 63 78 82 60" stroke="#1e293b" stroke-width="5" fill="none" stroke-linecap="round"/><path d="M 33 46 L 40 30 L 66 30 L 76 46 L 76 56 L 33 56 Z" fill="#1e293b"/><circle cx="43" cy="56" r="6" fill="#1e293b"/><circle cx="66" cy="56" r="6" fill="#1e293b"/>`;
     const iconoFlechaDerecha = `<path d="M 28 55 L 72 55 M 60 42 L 72 55 L 60 68" stroke="#1e293b" stroke-width="8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`;
     const iconoTresCarriles = `<path d="M 35 70 L 35 38 M 28 60 L 35 70 L 42 60" stroke="#1e293b" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M 52 70 L 52 38 M 45 48 L 52 38 L 59 48" stroke="#1e293b" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M 69 70 L 69 38 M 62 48 L 69 38 L 76 48" stroke="#1e293b" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`;
-    const iconoGiroU = `<path d="M 45 30 L 45 55 Q 45 70 60 70 Q 75 70 75 55 L 75 35 M 68 42 L 75 35 L 82 42" stroke="#1e293b" stroke-width="7" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`;
-    const iconoFlechaBifurcacion = `<path d="M 62 75 L 62 45 M 55 52 L 62 45 L 69 52" stroke="#1e293b" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M 60 60 Q 42 48 32 32 M 35 42 L 32 32 L 42 35" stroke="#1e293b" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`;
+    const iconoGiroU = `<path d="M 75 75 L 75 45 Q 75 28 58 28 Q 41 28 41 45 L 41 68 M 34 60 L 41 68 L 48 60" stroke="#1e293b" stroke-width="7" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`;
+    const iconoFlechaBifurcacion = `<path d="M 75 100 L 75 35 M 65 48 L 75 35 L 85 48" stroke="#1e293b" stroke-width="8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M 75 88 Q 50 72 35 45 M 40 58 L 35 45 L 48 50" stroke="#1e293b" stroke-width="8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`;
     const iconoPeatonIzquierda = `<circle cx="42" cy="32" r="7" fill="#1e293b"/><path d="M 42 42 L 42 62 M 42 47 L 58 42 M 42 62 L 34 76 M 42 62 L 52 76" stroke="#1e293b" stroke-width="5" fill="none" stroke-linecap="round"/><path d="M 63 50 L 80 50 M 70 43 L 63 50 L 70 57" stroke="#1e293b" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`;
-    const iconoLucesBajas = `<ellipse cx="42" cy="50" rx="11" ry="7" fill="#1e293b"/><path d="M 58 43 L 76 36 M 58 50 L 79 50 M 58 57 L 76 64" stroke="#1e293b" stroke-width="4" stroke-linecap="round"/>`;
-    const iconoDistanciaAutos = `<rect x="30" y="30" width="24" height="16" rx="3" fill="#1e293b"/><rect x="30" y="55" width="24" height="16" rx="3" fill="#1e293b"/><line x1="42" y1="48" x2="42" y2="53" stroke="#1e293b" stroke-width="3"/>`;
+    const iconoLucesBajas = `<ellipse cx="40" cy="52" rx="14" ry="9" fill="#1e293b"/><path d="M 58 40 L 82 30 M 58 52 L 85 52 M 58 64 L 82 74" stroke="#1e293b" stroke-width="5" stroke-linecap="round"/>`;
+    const iconoDistanciaAutos = `<path d="M 32 30 L 32 24 Q 32 20 36 20 L 64 20 Q 68 20 68 24 L 68 30 Z" fill="#1e293b"/><rect x="24" y="30" width="52" height="17" rx="4" fill="#1e293b"/><circle cx="34" cy="49" r="4" fill="#fff"/><circle cx="66" cy="49" r="4" fill="#fff"/><path d="M 32 68 L 32 62 Q 32 58 36 58 L 64 58 Q 68 58 68 62 L 68 68 Z" fill="#1e293b"/><rect x="24" y="68" width="52" height="17" rx="4" fill="#1e293b"/><circle cx="34" cy="87" r="4" fill="#fff"/><circle cx="66" cy="87" r="4" fill="#fff"/>`;
     const iconoDosFlechasVertical = `<path d="M 45 30 L 45 70 M 38 62 L 45 70 L 52 62" stroke="#1e293b" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M 75 70 L 75 30 M 68 38 L 75 30 L 82 38" stroke="#1e293b" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`;
 
     // Señal informativa verde en 3D (rombo verde), sobre tarjeta con sombra
@@ -1134,7 +1156,7 @@
         <rect x="130" y="82" width="25" height="6" rx="3" fill="#cbd5e1"/>
       </svg>`;
     }
-    const iconoCarrilAdicional = `<path d="M 50 75 L 50 45 M 40 55 L 50 45 L 60 55" stroke="#1e293b" stroke-width="7" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M 65 75 L 78 50" stroke="#1e293b" stroke-width="7" fill="none" stroke-linecap="round"/>`;
+    const iconoCarrilAdicional = `<path d="M 35 88 L 35 30 M 27 42 L 35 30 L 43 42" stroke="#1e293b" stroke-width="7" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M 75 88 L 75 30 M 67 42 L 75 30 L 83 42" stroke="#1e293b" stroke-width="7" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M 52 88 Q 52 58 67 46" stroke="#1e293b" stroke-width="6" fill="none" stroke-linecap="round"/>`;
 
     // Escena: dos señales de velocidad (máxima y mínima) junto a un auto
     function escenaLimitesVelocidad3D() {
@@ -3136,7 +3158,7 @@
       {
         id: 101, category: "Señales",
         question: "101. Usted se encuentra conduciendo su auto por una vía y, antes de cruzar la intersección, se encuentra con la señal R-4, esta le indica:",
-        imageHtml: senalCircular3D(iconoBarraNoEntre, false),
+        imageHtml: senalR4_3D(),
         options: [
           "a) Que la calle está clausurada.",
           "b) Que está por ingresar a una vía de sentido contrario y no debe entrar.",
@@ -3145,7 +3167,7 @@
         ],
         correct: 1,
         explanations: [
-          "Esa barra blanca sobre fondo rojo es la clásica señal de 'NO ENTRE': te avisa que esa vía va en sentido contrario al tuyo, así que definitivamente no debes ingresar por ahí.",
+          "Ese rombo con la franja negra cruzando los dos rectángulos amarillos es la señal R-4: te avisa que esa vía va en sentido contrario al tuyo, así que definitivamente no debes ingresar por ahí.",
           "No significa que la calle esté cerrada por obras ni que debas simplemente parar: es una prohibición total de entrada en ese sentido.",
           "Si te la encuentras, la solución es buscar otra calle o dar la vuelta, nunca intentar entrar 'con cuidado'."
         ]
@@ -3220,7 +3242,7 @@
       },
       {
         id: 106, category: "Señales",
-        question: "106. La señal (R-6-4), significa:",
+        question: "106. La señal (R-5-4), significa:",
         imageHtml: senalSoloGiro3D(),
         options: [
           "a) La vía no continúa y los conductores deben girar a la izquierda.",
@@ -3255,7 +3277,7 @@
       {
         id: 108, category: "Señales",
         question: "108. La señal (R-5-2), significa:",
-        imageHtml: senalCircular3D(iconoFlechaBifurcacion, false),
+        imageHtml: senalRectangular3D(iconoFlechaBifurcacion),
         options: [
           "a) Que la vía solo permite girar a la izquierda.",
           "b) Prevención por bifurcación de la vía.",
