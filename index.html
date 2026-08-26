@@ -346,6 +346,21 @@
       </svg>`;
     }
 
+    // Señal circular (reglamentaria) con una placa de texto debajo, ej. R-14 "CIRCULACION"
+    function senalCircularConTexto3D(iconoInterior, prohibido, texto) {
+      return `<svg viewBox="0 0 120 148" class="w-24 sm:w-28 icon-3d">
+        <rect x="3" y="3" width="114" height="142" rx="24" fill="url(#gradCardPink)"/>
+        ${sombraSuelo(60,138,34,6)}
+        <circle cx="60" cy="56" r="46" fill="url(#gradRed3d)"/>
+        <circle cx="60" cy="56" r="37" fill="url(#gradWhite3d)"/>
+        ${brilloElipse(46,32,20,10)}
+        <g transform="translate(10,6)">${iconoInterior}</g>
+        ${prohibido ? '<line x1="33" y1="27" x2="87" y2="85" stroke="#dc2626" stroke-width="9" stroke-linecap="round"/>' : ''}
+        <rect x="12" y="114" width="96" height="26" rx="5" fill="url(#gradWhite3d)" stroke="#1e293b" stroke-width="2"/>
+        <text x="60" y="132" font-family="Quicksand" font-weight="800" font-size="11" fill="#1e293b" text-anchor="middle">${texto}</text>
+      </svg>`;
+    }
+
     // Señal "Prohibido estacionar" (disco azul, aro rojo, letra P), sobre tarjeta con sombra
     function senalNoEstacionar3D() {
       return `<svg viewBox="0 0 120 120" class="w-20 h-20 sm:w-24 sm:h-24 icon-3d">
@@ -469,6 +484,26 @@
       </svg>`;
     }
 
+    // Escena: carril cerrándose con delineadores tubulares (cierre de carril / taper)
+    function escenaDelineadoresTaper3D() {
+      const conos = [0,1,2,3,4].map(i => {
+        const t = i/4;
+        const x = 200 - t*80;
+        const y = 30 + t*34;
+        return `<polygon points="${x},${y-6} ${x-5},${y+5} ${x+5},${y+5}" fill="#f97316" stroke="#7c2d12" stroke-width="1"/>`;
+      }).join('');
+      return `<svg viewBox="0 0 220 150" class="w-36 sm:w-44 icon-3d">
+        <rect x="3" y="3" width="214" height="144" rx="26" fill="url(#gradCardPink)"/>
+        <rect x="14" y="18" width="192" height="114" rx="16" fill="url(#gradAsphalt3d)"/>
+        <line x1="110" y1="18" x2="110" y2="132" stroke="#facc15" stroke-width="4"/>
+        <path d="M 200 30 L 120 64 L 120 132" stroke="#f8fafc" stroke-width="3" stroke-dasharray="9 7" fill="none" opacity="0.8"/>
+        ${conos}
+        ${sombraSuelo(65,100,28,6)}
+        <rect x="40" y="86" width="54" height="28" rx="12" fill="url(#gradPurpleCar3d)"/>
+        <rect x="40" y="86" width="54" height="10" rx="10" fill="#fff" opacity="0.25"/>
+      </svg>`;
+    }
+
     // Escena: cruce ferroviario con tren
     function escenaTren3D() {
       return `<svg viewBox="0 0 200 170" class="w-32 sm:w-40 icon-3d">
@@ -559,12 +594,12 @@
         <rect x="3" y="3" width="214" height="124" rx="26" fill="url(#gradCardSky)"/>
         ${sombraSuelo(60,108,30,6)}
         <rect x="32" y="24" width="56" height="56" rx="8" fill="url(#gradAmber3d)" transform="rotate(45 60 52)"/>
-        <path d="M 45 65 L 45 45 Q 45 35 55 35 L 70 35" stroke="#1e293b" stroke-width="6" fill="none" stroke-linecap="round"/>
-        <path d="M 62 28 L 70 35 L 62 42" stroke="#1e293b" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M 45 75 L 45 45 L 76 45" stroke="#1e293b" stroke-width="7" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M 68 37 L 76 45 L 68 53" stroke="#1e293b" stroke-width="7" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
         ${sombraSuelo(160,108,30,6)}
         <rect x="132" y="24" width="56" height="56" rx="8" fill="url(#gradAmber3d)" transform="rotate(45 160 52)"/>
-        <path d="M 145 68 Q 145 40 175 40" stroke="#1e293b" stroke-width="6" fill="none" stroke-linecap="round"/>
-        <path d="M 168 33 L 175 40 L 168 47" stroke="#1e293b" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M 145 75 Q 145 40 180 40" stroke="#1e293b" stroke-width="7" fill="none" stroke-linecap="round"/>
+        <path d="M 172 33 L 180 40 L 172 47" stroke="#1e293b" stroke-width="7" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>`;
     }
 
@@ -855,8 +890,8 @@
         <rect x="3" y="3" width="114" height="144" rx="24" fill="url(#gradCardSky)"/>
         ${sombraSuelo(60,134,32,6)}
         <rect x="20" y="15" width="80" height="90" rx="8" fill="url(#gradWhite3d)" stroke="#1e293b" stroke-width="2"/>
-        <path d="M 45 75 Q 30 75 30 50 Q 30 26 47 22 M 39 30 L 47 22 L 52 33" stroke="#1e293b" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-        <path d="M 75 75 Q 60 75 60 50 Q 60 26 77 22 M 69 30 L 77 22 L 82 33" stroke="#1e293b" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M 60 88 Q 45 88 40 65 Q 37 42 24 30 M 32 38 L 24 30 L 30 42" stroke="#1e293b" stroke-width="7" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M 60 88 Q 75 88 80 65 Q 83 42 96 30 M 88 38 L 96 30 L 90 42" stroke="#1e293b" stroke-width="7" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
         <rect x="30" y="108" width="60" height="22" rx="5" fill="url(#gradWhite3d)" stroke="#1e293b" stroke-width="2"/>
         <text x="60" y="124" font-family="Quicksand" font-weight="800" font-size="14" fill="#1e293b" text-anchor="middle">SOLO</text>
       </svg>`;
@@ -873,14 +908,17 @@
     }
 
     // Señal R-4 (rombo con franja diagonal negra y dos rectángulos amarillos)
-    function senalR4_3D() {
+    // Señal R-4 "NO ENTRE" (círculo rojo, barra blanca y texto, sobre placa blanca cuadrada)
+    function senalNoEntre3D() {
       return `<svg viewBox="0 0 120 120" class="w-24 h-24 sm:w-28 sm:h-28 icon-3d">
         <rect x="3" y="3" width="114" height="114" rx="24" fill="url(#gradCardSky)"/>
         ${sombraSuelo(60,104,32,6)}
-        <polygon points="60,14 106,60 60,106 14,60" fill="url(#gradWhite3d)" stroke="#1e293b" stroke-width="5"/>
-        <rect x="38" y="34" width="20" height="34" fill="#fde047" stroke="#1e293b" stroke-width="2"/>
-        <rect x="60" y="50" width="20" height="34" fill="#fde047" stroke="#1e293b" stroke-width="2"/>
-        <polygon points="24,78 88,32 98,46 34,92" fill="#1e293b"/>
+        <rect x="16" y="16" width="88" height="88" rx="10" fill="url(#gradWhite3d)" stroke="#1e293b" stroke-width="3"/>
+        <circle cx="60" cy="60" r="36" fill="url(#gradRed3d)"/>
+        ${brilloElipse(48,42,16,7)}
+        <text x="60" y="48" font-family="Quicksand" font-weight="800" font-size="15" fill="#fff" text-anchor="middle">NO</text>
+        <rect x="32" y="55" width="56" height="13" rx="3" fill="#fff"/>
+        <text x="60" y="86" font-family="Quicksand" font-weight="800" font-size="13" fill="#fff" text-anchor="middle">ENTRE</text>
       </svg>`;
     }
 
@@ -893,9 +931,9 @@
     const iconoGiroU = `<path d="M 75 75 L 75 45 Q 75 28 58 28 Q 41 28 41 45 L 41 68 M 34 60 L 41 68 L 48 60" stroke="#1e293b" stroke-width="7" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`;
     const iconoFlechaBifurcacion = `<path d="M 75 100 L 75 35 M 65 48 L 75 35 L 85 48" stroke="#1e293b" stroke-width="8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M 75 88 Q 50 72 35 45 M 40 58 L 35 45 L 48 50" stroke="#1e293b" stroke-width="8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`;
     const iconoPeatonIzquierda = `<circle cx="42" cy="32" r="7" fill="#1e293b"/><path d="M 42 42 L 42 62 M 42 47 L 58 42 M 42 62 L 34 76 M 42 62 L 52 76" stroke="#1e293b" stroke-width="5" fill="none" stroke-linecap="round"/><path d="M 63 50 L 80 50 M 70 43 L 63 50 L 70 57" stroke="#1e293b" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`;
-    const iconoLucesBajas = `<ellipse cx="40" cy="52" rx="14" ry="9" fill="#1e293b"/><path d="M 58 40 L 82 30 M 58 52 L 85 52 M 58 64 L 82 74" stroke="#1e293b" stroke-width="5" stroke-linecap="round"/>`;
-    const iconoDistanciaAutos = `<path d="M 32 30 L 32 24 Q 32 20 36 20 L 64 20 Q 68 20 68 24 L 68 30 Z" fill="#1e293b"/><rect x="24" y="30" width="52" height="17" rx="4" fill="#1e293b"/><circle cx="34" cy="49" r="4" fill="#fff"/><circle cx="66" cy="49" r="4" fill="#fff"/><path d="M 32 68 L 32 62 Q 32 58 36 58 L 64 58 Q 68 58 68 62 L 68 68 Z" fill="#1e293b"/><rect x="24" y="68" width="52" height="17" rx="4" fill="#1e293b"/><circle cx="34" cy="87" r="4" fill="#fff"/><circle cx="66" cy="87" r="4" fill="#fff"/>`;
-    const iconoDosFlechasVertical = `<path d="M 45 30 L 45 70 M 38 62 L 45 70 L 52 62" stroke="#1e293b" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M 75 70 L 75 30 M 68 38 L 75 30 L 82 38" stroke="#1e293b" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`;
+    const iconoLucesBajas = `<circle cx="72" cy="52" r="13" fill="#1e293b"/><line x1="20" y1="38" x2="47" y2="38" stroke="#1e293b" stroke-width="6" stroke-linecap="round"/><line x1="20" y1="52" x2="52" y2="52" stroke="#1e293b" stroke-width="6" stroke-linecap="round"/><line x1="20" y1="66" x2="47" y2="66" stroke="#1e293b" stroke-width="6" stroke-linecap="round"/>`;
+    const iconoDistanciaAutos = `<rect x="14" y="46" width="26" height="17" rx="4" fill="#1e293b"/><rect x="18" y="36" width="18" height="14" rx="3" fill="#1e293b"/><line x1="44" y1="34" x2="58" y2="63" stroke="#1e293b" stroke-width="3" stroke-dasharray="4 4"/><line x1="56" y1="34" x2="70" y2="63" stroke="#1e293b" stroke-width="3" stroke-dasharray="4 4"/><rect x="74" y="46" width="26" height="17" rx="4" fill="#1e293b"/><rect x="78" y="36" width="18" height="14" rx="3" fill="#1e293b"/>`;
+    const iconoDosFlechasVertical = `<path d="M 20 55 L 52 55 M 32 45 L 20 55 L 32 65" stroke="#1e293b" stroke-width="7" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M 100 55 L 68 55 M 88 45 L 100 55 L 88 65" stroke="#1e293b" stroke-width="7" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`;
 
     // Señal informativa verde en 3D (rombo verde), sobre tarjeta con sombra
     function senalInformativaVerde3D(iconoInterior) {
@@ -905,6 +943,32 @@
         <rect x="31" y="29" width="58" height="58" rx="8" fill="url(#gradGreen3d)" transform="rotate(45 60 58)"/>
         ${brilloElipse(46,40,16,8)}
         <g transform="translate(14,12)">${iconoInterior}</g>
+      </svg>`;
+    }
+
+    // Señal verde (rombo) + placa blanca adicional con flecha diagonal debajo (P-46-B, P-48-B, etc.)
+    function senalInformativaVerdeConFlecha3D(iconoInterior) {
+      return `<svg viewBox="0 0 120 165" class="w-20 sm:w-24 icon-3d">
+        <rect x="3" y="3" width="114" height="159" rx="24" fill="url(#gradCardPink)"/>
+        ${sombraSuelo(60,150,32,6)}
+        <rect x="31" y="19" width="58" height="58" rx="8" fill="url(#gradGreen3d)" transform="rotate(45 60 48)"/>
+        ${brilloElipse(46,30,16,8)}
+        <g transform="translate(14,2)">${iconoInterior}</g>
+        <rect x="44" y="98" width="32" height="30" rx="6" fill="url(#gradWhite3d)" stroke="#1e293b" stroke-width="2"/>
+        <path d="M 67 108 L 53 122 M 53 112 L 53 122 L 63 122" stroke="#1e293b" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>`;
+    }
+
+    // Señal verde en forma de "casita" (pentágono), típica de la familia escolar P-49
+    function senalEscolarPentagono3D(iconoInterior, conFlecha) {
+      const alto = conFlecha ? 165 : 122;
+      return `<svg viewBox="0 0 120 ${alto}" class="w-20 sm:w-24 icon-3d">
+        <rect x="3" y="3" width="114" height="${alto-6}" rx="24" fill="url(#gradCardPink)"/>
+        ${sombraSuelo(60, conFlecha ? 150 : 108, 32, 6)}
+        <path d="M 18 58 L 18 100 L 102 100 L 102 58 L 60 16 Z" fill="url(#gradGreen3d)" stroke="#166534" stroke-width="1"/>
+        ${brilloElipse(42,40,16,8)}
+        <g transform="translate(8,10)">${iconoInterior}</g>
+        ${conFlecha ? `<rect x="44" y="108" width="32" height="30" rx="6" fill="url(#gradWhite3d)" stroke="#1e293b" stroke-width="2"/><path d="M 67 118 L 53 132 M 53 122 L 53 132 L 63 132" stroke="#1e293b" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>` : ''}
       </svg>`;
     }
 
@@ -932,17 +996,19 @@
     }
 
     // Íconos interiores adicionales para señales preventivas/informativas
-    const iconoCargaPeaton = `<rect x="20" y="52" width="30" height="18" rx="3" fill="#1e293b"/><rect x="50" y="42" width="20" height="28" rx="3" fill="#1e293b"/><circle cx="28" cy="72" r="5" fill="#1e293b"/><circle cx="60" cy="72" r="5" fill="#1e293b"/><circle cx="80" cy="35" r="6" fill="#1e293b"/><path d="M 80 41 L 80 55 M 80 45 L 88 50 M 80 55 L 75 66 M 80 55 L 86 66" stroke="#1e293b" stroke-width="4" fill="none" stroke-linecap="round"/>`;
-    const iconoCurvaIzqSolo = `M 70 20 Q 40 20 40 45 L 40 75 M 32 65 L 40 75 L 48 65`;
-    const iconoSCurvaDerecha = `<path d="M 35 78 Q 35 55 55 55 Q 75 55 75 32 M 65 25 L 75 32 L 68 40" stroke="#1e293b" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`;
-    const iconoSCurvaIzquierda = `<path d="M 75 78 Q 75 55 55 55 Q 35 55 35 32 M 45 25 L 35 32 L 42 40" stroke="#1e293b" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`;
+    const iconoCargaPeaton = `<rect x="18" y="52" width="28" height="18" rx="3" fill="#1e293b"/><rect x="46" y="42" width="18" height="28" rx="3" fill="#1e293b"/><circle cx="26" cy="72" r="5" fill="#1e293b"/><circle cx="56" cy="72" r="5" fill="#1e293b"/><line x1="67" y1="45" x2="80" y2="70" stroke="#1e293b" stroke-width="3" stroke-dasharray="4 4"/><line x1="78" y1="45" x2="91" y2="70" stroke="#1e293b" stroke-width="3" stroke-dasharray="4 4"/><circle cx="88" cy="35" r="6" fill="#1e293b"/><path d="M 88 41 L 88 55 M 88 45 L 96 50 M 88 55 L 83 66 M 88 55 L 94 66" stroke="#1e293b" stroke-width="4" fill="none" stroke-linecap="round"/>`;
+    const iconoCurvaIzqSolo = `M 75 78 Q 75 30 38 30 M 50 20 L 38 30 L 50 42`;
+    const iconoSCurvaDerecha = `<path d="M 38 85 L 38 58 L 65 42 L 65 20" stroke="#1e293b" stroke-width="9" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M 55 28 L 65 20 L 72 30" stroke="#1e293b" stroke-width="9" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`;
+    const iconoSCurvaIzquierda = `<path d="M 42 88 Q 72 75 55 58 Q 38 42 62 28" stroke="#1e293b" stroke-width="9" fill="none" stroke-linecap="round"/><path d="M 53 20 L 62 28 L 70 22" stroke="#1e293b" stroke-width="9" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`;
     const iconoChevronDerecha = `<path d="M 30 30 L 65 55 L 30 80" stroke="#1e293b" stroke-width="9" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`;
-    const iconoBaden = `<path d="M 20 65 Q 40 65 45 50 Q 50 40 60 40 Q 70 40 75 50 Q 80 65 100 65" stroke="#1e293b" stroke-width="6" fill="none" stroke-linecap="round"/>`;
+    const iconoBaden = `<path d="M 20 74 L 34 74 Q 34 42 60 42 Q 86 42 86 74 L 100 74 L 100 82 L 20 82 Z" fill="#1e293b"/>`;
     const iconoBici = `<circle cx="35" cy="70" r="11" fill="none" stroke="#1e293b" stroke-width="4"/><circle cx="78" cy="70" r="11" fill="none" stroke="#1e293b" stroke-width="4"/><path d="M 35 70 L 52 42 L 68 70 M 52 42 L 58 70 M 44 55 L 66 55" stroke="#1e293b" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`;
-    const iconoPeatonCruzandoVerde = `<circle cx="55" cy="25" r="7" fill="#1e293b"/><path d="M 55 35 L 55 55 M 55 40 L 70 35 M 55 55 L 45 70 M 55 55 L 65 70" stroke="#1e293b" stroke-width="5" fill="none" stroke-linecap="round"/><line x1="30" y1="78" x2="80" y2="78" stroke="#1e293b" stroke-width="4"/>`;
+    const iconoBiciConLineas = `<line x1="30" y1="16" x2="83" y2="16" stroke="#1e293b" stroke-width="4" stroke-dasharray="8 6" stroke-linecap="round"/>${iconoBici}<line x1="30" y1="96" x2="83" y2="96" stroke="#1e293b" stroke-width="4" stroke-dasharray="8 6" stroke-linecap="round"/>`;
+    const iconoPeatonCruzandoVerde = `<circle cx="55" cy="24" r="9" fill="#1e293b"/><path d="M 40 42 Q 55 32 70 42 L 66 62 L 72 88 L 62 88 L 57 66 L 52 88 L 42 88 L 48 62 Z" fill="#1e293b"/><line x1="28" y1="92" x2="82" y2="92" stroke="#1e293b" stroke-width="5" stroke-linecap="round"/>`;
     const iconoFamiliaEscolar = `<circle cx="42" cy="22" r="7" fill="#1e293b"/><path d="M 42 32 L 42 55 M 42 37 L 56 42 M 42 55 L 35 70 M 42 55 L 50 70" stroke="#1e293b" stroke-width="5" fill="none" stroke-linecap="round"/><circle cx="68" cy="38" r="5" fill="#1e293b"/><path d="M 68 45 L 68 60 M 68 48 L 58 44 M 68 60 L 62 72 M 68 60 L 74 72" stroke="#1e293b" stroke-width="4" fill="none" stroke-linecap="round"/>`;
+    const iconoFamiliaEscolarConLinea = `${iconoFamiliaEscolar}<line x1="18" y1="78" x2="92" y2="78" stroke="#1e293b" stroke-width="5" stroke-linecap="round"/>`;
     const iconoNinoJugando = `<circle cx="42" cy="25" r="7" fill="#1e293b"/><path d="M 42 35 L 40 55 M 42 40 L 58 35 M 40 55 L 33 65 M 40 55 L 60 62" stroke="#1e293b" stroke-width="5" fill="none" stroke-linecap="round"/><circle cx="72" cy="68" r="7" fill="none" stroke="#1e293b" stroke-width="3"/>`;
-    const iconoTractor = `<circle cx="42" cy="70" r="14" fill="none" stroke="#1e293b" stroke-width="5"/><circle cx="80" cy="75" r="9" fill="none" stroke="#1e293b" stroke-width="4"/><rect x="45" y="42" width="28" height="20" rx="3" fill="#1e293b"/><rect x="55" y="28" width="8" height="14" fill="#1e293b"/>`;
+    const iconoTractor = `<circle cx="42" cy="70" r="14" fill="none" stroke="#1e293b" stroke-width="5"/><circle cx="80" cy="75" r="9" fill="none" stroke="#1e293b" stroke-width="4"/><rect x="45" y="42" width="28" height="20" rx="3" fill="#1e293b"/><rect x="55" y="28" width="8" height="14" fill="#1e293b"/><circle cx="58" cy="19" r="6" fill="#1e293b"/><rect x="52" y="25" width="12" height="10" fill="#1e293b"/>`;
 
     // Señal informativa azul (cuadrado azul), sobre tarjeta con sombra
     function senalInformativaAzul3D(iconoInterior) {
@@ -982,10 +1048,10 @@
     const iconoBomberosCamion = `<rect x="22" y="45" width="48" height="26" rx="4" fill="#1e293b"/><rect x="70" y="52" width="16" height="19" rx="3" fill="#1e293b"/><circle cx="36" cy="74" r="7" fill="#1e293b"/><circle cx="72" cy="74" r="7" fill="#1e293b"/><line x1="32" y1="45" x2="32" y2="34" stroke="#1e293b" stroke-width="4"/>`;
     const iconoVientoLateral = `<path d="M 35 28 L 35 82" stroke="#1e293b" stroke-width="5"/><path d="M 35 30 Q 62 34 62 45 Q 62 56 35 52" fill="#1e293b"/>`;
     const iconoArenamiento = `<path d="M 18 62 Q 34 48 50 62 Q 66 76 82 62" stroke="#1e293b" stroke-width="5" fill="none" stroke-linecap="round"/><path d="M 22 74 Q 38 64 54 74 Q 70 84 86 74" stroke="#1e293b" stroke-width="5" fill="none" stroke-linecap="round"/>`;
-    const iconoAnimales = `<ellipse cx="52" cy="58" rx="24" ry="15" fill="#1e293b"/><circle cx="28" cy="46" r="9" fill="#1e293b"/><rect x="36" y="70" width="6" height="14" fill="#1e293b"/><rect x="64" y="70" width="6" height="14" fill="#1e293b"/>`;
-    const iconoSemaforoMini = `<rect x="40" y="22" width="20" height="52" rx="6" fill="#1e293b"/><circle cx="50" cy="33" r="5" fill="#fff"/><circle cx="50" cy="48" r="5" fill="#fff"/><circle cx="50" cy="63" r="5" fill="#fff"/>`;
-    const iconoMiniPare = `<polygon points="42,30 58,30 68,40 68,56 58,66 42,66 32,56 32,40" fill="#dc2626"/><text x="50" y="52" font-family="Quicksand" font-weight="800" font-size="9" fill="#fff" text-anchor="middle">PARE</text>`;
-    const iconoMiniCeda = `<polygon points="30,30 70,30 50,68" fill="#dc2626"/><polygon points="36,37 64,37 50,60" fill="#fff"/>`;
+    const iconoAnimales = `<ellipse cx="52" cy="58" rx="24" ry="15" fill="#1e293b"/><circle cx="26" cy="44" r="9" fill="#1e293b"/><path d="M 20 37 L 14 29 M 25 35 L 23 26" stroke="#1e293b" stroke-width="3" stroke-linecap="round"/><rect x="36" y="70" width="6" height="14" fill="#1e293b"/><rect x="64" y="70" width="6" height="14" fill="#1e293b"/><path d="M 74 50 Q 84 55 80 66" stroke="#1e293b" stroke-width="3" fill="none" stroke-linecap="round"/>`;
+    const iconoSemaforoMini = `<rect x="40" y="22" width="20" height="52" rx="6" fill="#1e293b"/><circle cx="50" cy="33" r="5" fill="#ef4444"/><circle cx="50" cy="48" r="5" fill="#f59e0b"/><circle cx="50" cy="63" r="5" fill="#22c55e"/>`;
+    const iconoMiniPare = `<path d="M 50 26 L 50 10 M 43 17 L 50 10 L 57 17" stroke="#1e293b" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round"/><polygon points="42,36 58,36 68,46 68,62 58,72 42,72 32,62 32,46" fill="#dc2626"/><text x="50" y="58" font-family="Quicksand" font-weight="800" font-size="9" fill="#fff" text-anchor="middle">PARE</text>`;
+    const iconoMiniCeda = `<path d="M 50 30 L 50 12 M 43 19 L 50 12 L 57 19" stroke="#1e293b" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round"/><polygon points="30,38 70,38 50,76" fill="#dc2626"/><polygon points="36,45 64,45 50,68" fill="#fff"/>`;
     const iconoFinRestriccion = `<path d="M 30 55 L 30 42 Q 30 32 40 32 L 60 32 Q 70 32 70 42 L 70 55 Z" fill="#1e293b"/><rect x="24" y="55" width="52" height="8" rx="3" fill="#1e293b"/><circle cx="36" cy="65" r="6" fill="#1e293b"/><circle cx="64" cy="65" r="6" fill="#1e293b"/>`;
 
     // Escena: auto sedán
@@ -1156,7 +1222,7 @@
         <rect x="130" y="82" width="25" height="6" rx="3" fill="#cbd5e1"/>
       </svg>`;
     }
-    const iconoCarrilAdicional = `<path d="M 35 88 L 35 30 M 27 42 L 35 30 L 43 42" stroke="#1e293b" stroke-width="7" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M 75 88 L 75 30 M 67 42 L 75 30 L 83 42" stroke="#1e293b" stroke-width="7" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M 52 88 Q 52 58 67 46" stroke="#1e293b" stroke-width="6" fill="none" stroke-linecap="round"/>`;
+    const iconoCarrilAdicional = `<line x1="60" y1="30" x2="60" y2="85" stroke="#1e293b" stroke-width="3" stroke-dasharray="6 5"/><path d="M 38 88 L 38 28 M 30 40 L 38 28 L 46 40" stroke="#1e293b" stroke-width="7" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M 86 88 L 70 35 M 63 45 L 70 35 L 78 42" stroke="#1e293b" stroke-width="7" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`;
 
     // Escena: dos señales de velocidad (máxima y mínima) junto a un auto
     function escenaLimitesVelocidad3D() {
@@ -1452,7 +1518,27 @@
       "¡Así me gusta verte! Con confianza y con ganas de aprender 🌷",
       "¡Otro logro más! Ya falta menos para verte manejando feliz 🚘💕",
       "¡Tu dedicación es admirable! Sigue así de enfocada, mamita 🎓",
-      "¡Vas súper bien! Cada pregunta que aciertas es un aplauso para ti 👏❤️"
+      "¡Vas súper bien! Cada pregunta que aciertas es un aplauso para ti 👏❤️",
+      "¡Firme, mamá! Se nota que cada repaso va quedando grabado 📚✨",
+      "¡Qué orgullo, mamita! Tu esfuerzo silencioso ya está dando resultados 🌟",
+      "¡Vas con paso seguro! Nada te va a detener en este camino 🚦💪",
+      "¡Eso es, mamá! Sigue confiando en ti, lo estás haciendo genial 🌈",
+      "¡Increíble constancia! Cada día que practicas te acercas más a la meta 🎯",
+      "¡Así se conduce hacia el éxito, mamita! Sigue con esa actitud 🚗🌟",
+      "¡Qué gusto verte así de concentrada! Vas a lograrlo, confío en ti 🥰",
+      "¡Otra racha buena, mamá! Tu cabeza ya se sabe las señales de memoria 🧠🚦",
+      "¡Vas brillando cada vez más, mamita! Sigue con ese entusiasmo ✨💕",
+      "¡Eso es dedicación pura, mamá! Nada de esto es casualidad, es esfuerzo 💪📖",
+      "¡Sigue así de enfocada! Ya casi puedo verte con tu brevete en la mano 🎉🚘",
+      "¡Vas requetebién, mamita! Cada acierto es un ladrillo más de tu logro 🧱❤️",
+      "¡Qué avance tan bonito, mamá! Sigamos con esta misma energía 🌸🚗",
+      "¡Tu esfuerzo no pasa desapercibido, mamita! Estoy súper orgulloso de ti 🥹💖",
+      "¡Eres imparable! Cada pregunta correcta te acerca un poquito más a tu sueño 🌟🚦",
+      "¡Así se hace, mamá! Con calma, con ganas y sin rendirte 💪🌈",
+      "¡Qué gran racha, mamita! El examen ya no te va a agarrar de sorpresa 🎯📘",
+      "¡Sigues mejorando cada vez más! Eso es puro talento y disciplina 👏✨",
+      "¡Vas que vuelas, mamá! Muy pronto vas a manejar con toda confianza 🚗💨",
+      "¡Cada intento te hace más fuerte, mamita! Sigue con esa hermosa constancia 🌷💪"
     ];
 
     // Celebración especial cada 10 aciertos: confeti premium + mensaje motivador grande
@@ -3022,7 +3108,7 @@
       {
         id: 93, category: "Marcas en el piso",
         question: "93. Si un conductor que circula por el carril derecho de una vía se encuentra con flechas inclinadas en el pavimento indicando el cierre de su carril, su conducta correcta es:",
-        imageHtml: escenaCarril3D(),
+        imageHtml: escenaDelineadoresTaper3D(),
         options: [
           "a) Continuar la circulación por el carril en que se encuentra.",
           "b) Adelantar al vehículo que se encuentra delante y que circula por el carril izquierdo.",
@@ -3158,7 +3244,7 @@
       {
         id: 101, category: "Señales",
         question: "101. Usted se encuentra conduciendo su auto por una vía y, antes de cruzar la intersección, se encuentra con la señal R-4, esta le indica:",
-        imageHtml: senalR4_3D(),
+        imageHtml: senalNoEntre3D(),
         options: [
           "a) Que la calle está clausurada.",
           "b) Que está por ingresar a una vía de sentido contrario y no debe entrar.",
@@ -3167,7 +3253,7 @@
         ],
         correct: 1,
         explanations: [
-          "Ese rombo con la franja negra cruzando los dos rectángulos amarillos es la señal R-4: te avisa que esa vía va en sentido contrario al tuyo, así que definitivamente no debes ingresar por ahí.",
+          "Esa barra blanca sobre el círculo rojo, con las palabras 'NO' y 'ENTRE', es la clásica señal R-4: te avisa que esa vía va en sentido contrario al tuyo, así que definitivamente no debes ingresar por ahí.",
           "No significa que la calle esté cerrada por obras ni que debas simplemente parar: es una prohibición total de entrada en ese sentido.",
           "Si te la encuentras, la solución es buscar otra calle o dar la vuelta, nunca intentar entrar 'con cuidado'."
         ]
@@ -3192,7 +3278,7 @@
       {
         id: 103, category: "Señales",
         question: "103. La siguiente señal (R-14), significa:",
-        imageHtml: senalCircular3D(iconoFlechaDerecha, false),
+        imageHtml: senalCircularConTexto3D(iconoFlechaDerecha, false, 'CIRCULACION'),
         options: [
           "a) Circular por el carril derecho.",
           "b) Circular por el carril central.",
@@ -3498,7 +3584,7 @@
       {
         id: 121, category: "Señales",
         question: "121. La siguiente señal (P-46-A), indica:",
-        imageHtml: senalInformativaVerde3D(iconoBici),
+        imageHtml: senalInformativaVerde3D(iconoBiciConLineas),
         options: [
           "a) Que los ciclistas deben usar la ciclovía.",
           "b) Nos aproximamos a un cruce de ciclovía.",
@@ -3515,7 +3601,7 @@
       {
         id: 122, category: "Señales",
         question: "122. La señal de prevención (P-46-B), indica:",
-        imageHtml: senalInformativaVerde3D(iconoBici),
+        imageHtml: senalInformativaVerdeConFlecha3D(iconoBiciConLineas),
         options: [
           "a) Los ciclistas deben detenerse en ese punto.",
           "b) Aproximación a un cruce de ciclovía.",
@@ -3566,7 +3652,7 @@
       {
         id: 125, category: "Señales",
         question: "125. La siguiente señal (P-48-B), indica:",
-        imageHtml: senalInformativaVerde3D(iconoPeatonCruzandoVerde),
+        imageHtml: senalInformativaVerdeConFlecha3D(iconoPeatonCruzandoVerde),
         options: [
           "a) Ubicación de cruce escolar.",
           "b) Proximidad a una calzada.",
@@ -3583,7 +3669,7 @@
       {
         id: 126, category: "Señales",
         question: "126. La siguiente señal (P-49), indica:",
-        imageHtml: senalInformativaVerde3D(iconoFamiliaEscolar),
+        imageHtml: senalEscolarPentagono3D(iconoFamiliaEscolar, false),
         options: [
           "a) Zona escolar.",
           "b) Proximidad a un cruce peatonal.",
@@ -3600,7 +3686,7 @@
       {
         id: 127, category: "Señales",
         question: "127. La siguiente señal (P-49A), indica:",
-        imageHtml: senalInformativaVerde3D(iconoFamiliaEscolar),
+        imageHtml: senalEscolarPentagono3D(iconoFamiliaEscolarConLinea, false),
         options: [
           "a) Zona escolar.",
           "b) Proximidad a un cruce escolar.",
@@ -3617,7 +3703,7 @@
       {
         id: 128, category: "Señales",
         question: "128. La señal (P-49B), indica:",
-        imageHtml: senalInformativaVerde3D(iconoFamiliaEscolar),
+        imageHtml: senalEscolarPentagono3D(iconoFamiliaEscolarConLinea, true),
         options: [
           "a) Zona transitada.",
           "b) Proximidad a cruce peatonal.",
@@ -3633,7 +3719,7 @@
       },
       {
         id: 129, category: "Señales",
-        question: "129. La siguiente señal (P-60), indica:",
+        question: "129. La siguiente señal (P-50), indica:",
         imageHtml: senalInformativaVerde3D(iconoNinoJugando),
         options: [
           "a) Zona de deportes.",
@@ -3905,7 +3991,7 @@
       },
       {
         id: 145, category: "Señales",
-        question: "145. La siguiente señal (I-16), se utiliza para indicar:",
+        question: "145. La siguiente señal (I-18), se utiliza para indicar:",
         imageHtml: senalInformativaAzul3D(iconoLlaveInglesa),
         options: [
           "a) Cercanía a una ferretería.",
@@ -3922,7 +4008,7 @@
       },
       {
         id: 146, category: "Señales",
-        question: "146. La señal (I-15), se utiliza para indicar:",
+        question: "146. La señal (I-19), se utiliza para indicar:",
         imageHtml: senalInformativaAzul3D(iconoGrifoI),
         options: [
           "a) Cercanía a un servicio mecánico.",
